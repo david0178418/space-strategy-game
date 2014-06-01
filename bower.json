@@ -1,11 +1,11 @@
 {
-  "name": "JS App Boilerplate",
+  "name": "Phaser Game",
   "version": "0.0.0",
   "homepage": "https://github.com/david0178418/simple-js-amd-app-boilerplate",
   "authors": [
     "David Granado <davidjgranado@gmail.com>"
   ],
-  "description": "Simple js app boilerplate",
+  "description": "Just prototyping some game ideas",
   "license": "MIT",
   "private": true,
   "ignore": [
