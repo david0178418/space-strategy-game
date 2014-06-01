@@ -1,6 +1,7 @@
 define(function(require) {
 	"use strict";
 	var Beam = require('entities/beam');
+	
 	return {
 			fireAt: function(target) {
 				var beam = Beam.create();

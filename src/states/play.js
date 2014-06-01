@@ -14,6 +14,8 @@ define(function(require) {
 		resourceFragments,
 		game = instanceManager.get('game');
 	
+	var PanSpeed = 3;
+	
 	States.Play = 'play';
 	game.state.add(States.Play, {
 		preload: function(game) {
@@ -38,9 +40,29 @@ define(function(require) {
 			game.world.setBounds(0, 0, CONFIG.stage.width, CONFIG.stage.height);
 			
 			game.stage.backgroundColor = '#333';
+			
+			this.planet1 = new Planet({x: 500, y: 500});
+			this.planet2 = new Planet({x: 400, y: 600});
+			
+			this.dragSelection = new DragSelection(this.select);
+			this.controls = instanceManager.get('controls');
 		},
 		update: function(game) {
+			game.debug.spriteBounds(this.planet1);
+			game.debug.spriteBounds(this.planet2);
+			var controls = this.controls;
 			
+			if(controls.panUp.isDown) {
+				this.game.camera.y -= PanSpeed;
+			} else if(controls.panDown.isDown) {
+				this.game.camera.y += PanSpeed;
+			}
+			
+			if(controls.panRight.isDown) {
+				this.game.camera.x += PanSpeed;
+			} else if(controls.panLeft.isDown) {
+				this.game.camera.x -= PanSpeed;
+			}
 		},
 		paused: function() {
 		},

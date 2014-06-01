@@ -1,10 +1,9 @@
 define(function(require) {
 	"use strict";
 	return {
-			initTargetClosest: function(props) {
-				this._targetAction = props.targetAction || function(){};
-				this._range = props.range || 10000;
-			},
+			_targetAction: function(){},
+			_range: 10000,
+		
 			aquireTarget: function(targets) {
 				var closestTarget,
 					closestDistance,

@@ -2,23 +2,31 @@ define(function(require) {
 	"use strict";
 	var _ = require('lodash'),
 		Phaser = require('phaser'),
-		instanceManager = require('instance-manager');
+		instanceManager = require('instance-manager'),
+		selectable = require('components/selectable');
 
 	function Planet(props) {
 		var game = instanceManager.get('game');
-		Phaser.Graphics.call(this, game, 0, 0);
+		Phaser.Sprite.call(this, game, props.x, props.y, 'planet');
 		
-		// draw a circle
-		this.lineStyle(3, 0x33ff33, 1);
-		this.beginFill(0xFFFF0B);
-		this.drawCircle(props.x, props.y, 50);
-		this.endFill();
+		// XXX TEMP SIZE FOR PLACEHOLDER
+		this.width = 50;
+		this.height = 50;
+		// END
+		
+		this.anchor.setTo(0.5, 0.5);
+		game.physics.enable(this, Phaser.Physics.ARCADE);
+		this.initSelectable();
+		game.add.existing(this);
 	}
 	
-	Planet.prototype = Object.create(Phaser.Graphics.prototype);
-	_.extend(Planet.prototype, {
-		constructor: Planet,
-	});
+	Planet.prototype = Object.create(Phaser.Sprite.prototype);
+	_.extend(
+		Planet.prototype,
+		selectable, {
+			constructor: Planet,
+		}
+	);
 	
 	window.Planet = Planet;
 	return Planet;

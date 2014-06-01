@@ -98,7 +98,7 @@ define(function(require, exports) {
 			init: function() {
 				var Ships = require('controllers/ships');
 				return new Ships();
-			}	
+			}
 		},
 
 		meteorController: {
@@ -122,13 +122,19 @@ define(function(require, exports) {
 				return new Hud();
 			},
 		},
-		
-		meteorTrail: {
-			cache: false,
+			
+		controls: {
 			init: function() {
-				var game = instanceManager.get('game');
-				
-				return null;
+				var Phaser = require('phaser'),
+					KeyCodes = Phaser.Keyboard,
+					game = instanceManager.get('game'),
+					keyboard = game.input.keyboard;
+				return {
+					panUp: keyboard.addKey(KeyCodes.W),
+					panRight: keyboard.addKey(KeyCodes.D),
+					panDown: keyboard.addKey(KeyCodes.S),
+					panLeft: keyboard.addKey(KeyCodes.A),
+				};
 			}
 		}
 	},
