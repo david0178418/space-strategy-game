@@ -12082,7 +12082,7 @@ Object.defineProperty(Phaser.Rectangle.prototype, "halfHeight", {
 Object.defineProperty(Phaser.Rectangle.prototype, "bottom", {
 
     get: function () {
-        return this.y + this.height;
+        return Math.max(this.y, this.y + this.height);
     },
 
     set: function (value) {
@@ -12121,7 +12121,7 @@ Object.defineProperty(Phaser.Rectangle.prototype, "bottomRight", {
 Object.defineProperty(Phaser.Rectangle.prototype, "left", {
 
     get: function () {
-        return this.x;
+        return Math.min(this.x, this.x + this.width);
     },
 
     set: function (value) {
@@ -12143,7 +12143,7 @@ Object.defineProperty(Phaser.Rectangle.prototype, "left", {
 Object.defineProperty(Phaser.Rectangle.prototype, "right", {
 
     get: function () {
-        return this.x + this.width;
+        return Math.max(this.x + this.width, this.x);
     },
 
     set: function (value) {
@@ -12227,7 +12227,7 @@ Object.defineProperty(Phaser.Rectangle.prototype, "centerY", {
 Object.defineProperty(Phaser.Rectangle.prototype, "top", {
 
     get: function () {
-        return this.y;
+        return Math.min(this.y, this.y + this.height);
     },
 
     set: function (value) {
@@ -12479,14 +12479,7 @@ Phaser.Rectangle.intersection = function (a, b, output) {
 * @return {boolean} A value of true if the specified object intersects with this Rectangle object; otherwise false.
 */
 Phaser.Rectangle.intersects = function (a, b) {
-
-    if (a.width <= 0 || a.height <= 0 || b.width <= 0 || b.height <= 0)
-    {
-        return false;
-    }
-
-    return !(a.right < b.x || a.bottom < b.y || a.x > b.right || a.y > b.bottom);
-
+    return !(a.right < b.left || a.bottom < b.top || a.left > b.right || a.top > b.bottom);
 };
 
 /**
