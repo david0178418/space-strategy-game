@@ -1,6 +1,7 @@
 define(function(require) {
 	"use strict";
-	var States = require('states'),
+	var _ = require('lodash'),
+		States = require('states'),
 		instanceManager = require('instance-manager'),
 		game = instanceManager.get('game');
 	
@@ -8,5 +9,10 @@ define(function(require) {
 
 	return function() {
 		game.state.start(States.Play);
+		_.defer(function() {
+			game.canvas.addEventListener('contextmenu', function (e) {
+				e.preventDefault();
+			});
+		});
 	};
 });
