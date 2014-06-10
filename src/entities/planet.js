@@ -3,7 +3,7 @@ define(function(require) {
 	var _ = require('lodash'),
 		Phaser = require('phaser'),
 		instanceManager = require('instance-manager'),
-		selectable = require('components/selectable');
+		selectableComponent = require('components/selectable');
 
 	function Planet(props) {
 		var game = instanceManager.get('game');
@@ -23,7 +23,7 @@ define(function(require) {
 	Planet.prototype = Object.create(Phaser.Sprite.prototype);
 	_.extend(
 		Planet.prototype,
-		selectable, {
+		selectableComponent, {
 			constructor: Planet,
 		}
 	);

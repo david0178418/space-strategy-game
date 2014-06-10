@@ -42,7 +42,7 @@ define(function(require) {
 				this.clear();
 				this.lineStyle(3, 0xFFFF0B);
 				this.beginFill(0xFFFF0B);
-				this.drawRect(0, 0,  dragX - this.position.x, dragY - this.position.y);
+				this.drawRect(0, 0, dragX - this.position.x, dragY - this.position.y);
 				this.endFill();
 				this.area.width = dragX - this.position.x;
 				this.area.height = dragY - this.position.y;
@@ -53,7 +53,7 @@ define(function(require) {
 					entity = this.worldEntities[x];
 					
 					if(entity.isSelectable) {
-						if(this.area.intersects(entity._bounds)) {
+						if(this.area.intersects(entity.getBounds())) {
 							entity.select();
 						} else if(entity.selected) {
 							entity.deselect();

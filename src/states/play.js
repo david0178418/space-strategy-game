@@ -14,7 +14,7 @@ define(function(require) {
 		resourceFragments,
 		game = instanceManager.get('game');
 	
-	var PanSpeed = 3;
+	var PanSpeed = 8;
 	
 	States.Play = 'play';
 	game.state.add(States.Play, {
@@ -44,12 +44,13 @@ define(function(require) {
 			this.planet1 = new Planet({x: 500, y: 500});
 			this.planet2 = new Planet({x: 400, y: 600});
 			
+			this.ship1 = new Ship({x: 100, y: 100});
+			this.ship2 = new Ship({x: 150, y:150});
+			
 			this.dragSelection = new DragSelection(this.select);
 			this.controls = instanceManager.get('controls');
 		},
 		update: function(game) {
-			game.debug.spriteBounds(this.planet1);
-			game.debug.spriteBounds(this.planet2);
 			var controls = this.controls;
 			
 			if(controls.panUp.isDown) {

@@ -5,7 +5,3 @@ Develping in full "code sketch" mode vs putting any thought into real architectu
 [Github page](https://david0178418.github.io/Turret-Command/)
 
 Requires bower to install third party libraries.
-
-A - move left
-D - move right
-SPACE - spawn turret
