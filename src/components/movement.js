@@ -4,9 +4,11 @@ define(function(require) {
 	
 	return {
 		moveTo: function(x, y) {
-			var time = this.game.physics.arcade.distanceToXY(this, x, y) * 1000 / this.speed;
+			var time = this.game.physics.arcade.distanceToXY(this, x, y) * 1000 / this.speed,
+				delay = this.moveTween.isRunning ? 0: 200;
+			
 			this.moveTween.stop();
-			console.log(x, y);
+			
 			this.moveTween = this.
 				game.
 				add.
@@ -14,7 +16,7 @@ define(function(require) {
 				to({
 					x:x,
 					y:y
-				}, time, Phaser.Easing.Cubic.In, true, 200);
+				}, time, Phaser.Easing.Quadratic.InOut, true, delay);
 		},
 	};
 });

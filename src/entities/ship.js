@@ -52,13 +52,6 @@ define(function(require) {
 			targetClosestComponent, {
 				constructor: Ship,
 				update: function() {
-					/*if(this.isDead()) {
-						this.kill();
-						return;
-					}
-
-					if(this.gunReady()) {
-					}*/
 					this.updateSelectionGraphic();
 				},
 				rightClickHandler: function(x, y) {

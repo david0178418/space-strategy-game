@@ -57,5 +57,8 @@ define(function(require) {
 			this.isSelected = false;
 			this._selectionGraphic.visible = false;
 		},
+		
+		rightClickHandler: function() {
+		},
 	};
 });

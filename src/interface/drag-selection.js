@@ -66,7 +66,6 @@ define(function(require) {
 				this.registerRightClick = true;
 			} else if(this.registerRightClick) {
 				this.registerRightClick = false;
-				console.log(this.mousePointer.worldX, this.mousePointer.worldY);
 				this.sendRightClick(this.mousePointer.worldX, this.mousePointer.worldY);
 			} else if(this.startSelection) {
 				this.startSelection = false;
