@@ -74,16 +74,37 @@ define(function(require) {
 				
 			}
 		},
+		
 		sendRightClick: function(x, y) {
 			var i,
-				entity;
+				entity,
+				avgX,
+				avgY,
+				xDiff,
+				yDiff,
+				xTotal = 0,
+				yTotal = 0,
+				selectedEntities = [];
 			
 			for(i = 0; i < this.selectableEntities.length; i++) {
 				entity = this.selectableEntities[i];
 				
 				if(entity.isSelected) {
-					entity.rightClickHandler(x, y);
+					selectedEntities.push(entity);
+
+					xTotal += entity.x;
+					yTotal += entity.y;
 				}
+			}
+			
+			avgX = xTotal / selectedEntities.length;
+			avgY = yTotal / selectedEntities.length;
+			
+			for(i = 0; i < selectedEntities.length; i++) {
+				entity = selectedEntities[i];
+				xDiff = avgX - entity.x;
+				yDiff = avgY - entity.y;
+				entity.rightClickHandler(x - xDiff, y - yDiff);
 			}
 		},
 	});
