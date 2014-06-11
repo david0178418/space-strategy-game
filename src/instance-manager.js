@@ -32,8 +32,6 @@ define(function(require, exports) {
 			init: function() {
 				return {
 					_lists: [
-						instanceManager.get('turrets'),
-						instanceManager.get('buildings'),
 					],
 					forEachAlive: function(callback, context) {
 						for(var x = 0; x < this._lists.length; x++) {
@@ -50,8 +48,6 @@ define(function(require, exports) {
 			init: function() {
 				return {
 					_lists: [
-						instanceManager.get('meteors'),
-						instanceManager.get('ships'),
 					],
 					forEachAlive: function(callback, context) {
 						//TODO less ghetto way of collecting all targetables
@@ -63,24 +59,6 @@ define(function(require, exports) {
 				};
 			}
 		},
-		
-		turrets: {
-			init: function() {
-				return instanceManager.get('group');
-			},
-		},
-		
-		buildings: {
-			init: function() {
-				return instanceManager.get('group');
-			},
-		},
-			
-		meteors: {
-			init: function() {
-				return instanceManager.get('group');
-			},
-		},
 			
 		ships: {
 			init: function() {
@@ -91,28 +69,6 @@ define(function(require, exports) {
 		beams: {
 			init: function() {
 				return instanceManager.get('group');
-			},
-		},
-			
-		shipController: {
-			init: function() {
-				var Ships = require('controllers/ships');
-				return new Ships();
-			}
-		},
-
-		meteorController: {
-			init: function() {
-				var Meteors = require('controllers/meteors');
-				return new Meteors();
-			},
-		},
-
-		resourceFragments: {
-			init: function() {
-				var ResourceFragments = require('controllers/resource-fragments');
-
-				return new ResourceFragments();
 			},
 		},
 		

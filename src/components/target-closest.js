@@ -1,32 +1,32 @@
 define(function(require) {
 	"use strict";
 	return {
-			_targetAction: function(){},
-			_range: 10000,
-		
-			aquireTarget: function(targets) {
-				var closestTarget,
-					closestDistance,
-					game = this.game,
-					arcade = game.physics.arcade;
+		_targetAction: function(){},
+		_range: 10000,
 
-				targets.forEachAlive(function(target) {
-					var distance = arcade.distanceBetween(this, target);
+		aquireTarget: function(targets) {
+			var closestTarget,
+				closestDistance,
+				game = this.game,
+				arcade = game.physics.arcade;
 
-					if(distance >= this._range) {
-						return;
-					}
+			targets.forEachAlive(function(target) {
+				var distance = arcade.distanceBetween(this, target);
 
-					if(!closestTarget || distance < closestDistance) {
-						closestTarget = target;
-						closestDistance = distance;
-					}
-				}, this);
-
-				if(closestTarget) {
-					this._targetAction(closestTarget);
+				if(distance >= this._range) {
+					return;
 				}
-			},
-		};
+
+				if(!closestTarget || distance < closestDistance) {
+					closestTarget = target;
+					closestDistance = distance;
+				}
+			}, this);
+
+			if(closestTarget) {
+				this._targetAction(closestTarget);
+			}
+		},
+	};
 });
 

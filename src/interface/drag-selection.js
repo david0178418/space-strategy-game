@@ -9,12 +9,13 @@ define(function(require) {
 		Phaser.Graphics.call(this, game, 0, 0);
 		
 		this.area = new Phaser.Rectangle(0, 0, 1, 1);
-		this.worldEntities = game.world.children;
+		this.selectableEntities = game.world.children;
 		this.endPoint = new Phaser.Point();
 		this.mouse = game.input.mouse;
 		this.alpha = 0.25;
 		this.visible = false;
 		this.startSelection = false;
+		this.mousePointer = game.input.mousePointer;
 		game.add.existing(this);
 	}
 	
@@ -22,15 +23,15 @@ define(function(require) {
 	_.extend(DragSelection.prototype, {
 		constructor: DragSelection,
 		update: function() {
-			var x,
+			var i,
 				entity,
 				entitiesLength,
 				dragX,
 				dragY;
 			
 			if(this.mouse.button === 0) {
-				dragX = this.game.input.mousePointer.worldX,
-				dragY = this.game.input.mousePointer.worldY;
+				dragX = this.mousePointer.worldX;
+				dragY = this.mousePointer.worldY;
 				
 				if(!this.startSelection) {
 					this.startSelection = true;
@@ -39,6 +40,7 @@ define(function(require) {
 					this.area.x = dragX - 10;
 					this.area.y = dragY - 10;
 				}
+				
 				this.clear();
 				this.lineStyle(3, 0xFFFF0B);
 				this.beginFill(0xFFFF0B);
@@ -47,25 +49,43 @@ define(function(require) {
 				this.area.width = dragX - this.position.x;
 				this.area.height = dragY - this.position.y;
 				
-				entitiesLength = this.worldEntities.length;
+				entitiesLength = this.selectableEntities.length;
 					
-				for(x = 0; x < entitiesLength; x++) {
-					entity = this.worldEntities[x];
+				for(i = 0; i < entitiesLength; i++) {
+					entity = this.selectableEntities[i];
 					
 					if(entity.isSelectable) {
 						if(this.area.intersects(entity.getBounds())) {
 							entity.select();
-						} else if(entity.selected) {
+						} else if(entity.isSelected) {
 							entity.deselect();
 						}
 					}
 				}
+			} else if(this.mouse.button === 2) {
+				this.registerRightClick = true;
+			} else if(this.registerRightClick) {
+				this.registerRightClick = false;
+				console.log(this.mousePointer.worldX, this.mousePointer.worldY);
+				this.sendRightClick(this.mousePointer.worldX, this.mousePointer.worldY);
 			} else if(this.startSelection) {
 				this.startSelection = false;
 				this.visible = false;
 				
 			}
-		}
+		},
+		sendRightClick: function(x, y) {
+			var i,
+				entity;
+			
+			for(i = 0; i < this.selectableEntities.length; i++) {
+				entity = this.selectableEntities[i];
+				
+				if(entity.isSelected) {
+					entity.rightClickHandler(x, y);
+				}
+			}
+		},
 	});
 	
 	window.DragSelection = DragSelection;

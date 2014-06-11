@@ -1,6 +1,5 @@
 define(function(require) {
 	"use strict";
-
 	var _ = require('lodash'),
 		Phaser = require('phaser'),
 		damageComponent = require('components/damage'),
@@ -8,6 +7,7 @@ define(function(require) {
 		laserGunComponent = require('components/laser-gun'),
 		targetClosestComponent = require('components/target-closest'),
 		selectableComponent = require('components/selectable'),
+		movementComponent = require('components/movement'),
 		instanceManager = require('instance-manager');
 	
 	function Ship(props) {
@@ -25,6 +25,8 @@ define(function(require) {
 		game.physics.enable(this, Phaser.Physics.ARCADE);
 		this.initSelectable();
 		
+		this.moveTween = this.game.add.tween(this);
+		this.speed = 100
 		game.add.existing(this);
 	}
 	
@@ -42,22 +44,28 @@ define(function(require) {
 	
 	Ship.prototype = Object.create(Phaser.Sprite.prototype);
 	_.extend(Ship.prototype,
-		damageComponent, 
-		gunComponent,
-		laserGunComponent,
-		selectableComponent,
-		targetClosestComponent, {
-			constructor: Ship,
-			update: function() {
-				/*if(this.isDead()) {
-					this.kill();
-					return;
-				}
+			damageComponent, 
+			gunComponent,
+			laserGunComponent,
+			movementComponent,
+			selectableComponent,
+			targetClosestComponent, {
+				constructor: Ship,
+				update: function() {
+					/*if(this.isDead()) {
+						this.kill();
+						return;
+					}
 
-				if(this.gunReady()) {
-				}*/
-			},
-		});
+					if(this.gunReady()) {
+					}*/
+					this.updateSelectionGraphic();
+				},
+				rightClickHandler: function(x, y) {
+					this.moveTo(x, y);
+				}
+			}
+		);
 
 	return Ship;
 });
