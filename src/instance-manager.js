@@ -90,6 +90,7 @@ define(function(require, exports) {
 					panRight: keyboard.addKey(KeyCodes.D),
 					panDown: keyboard.addKey(KeyCodes.S),
 					panLeft: keyboard.addKey(KeyCodes.A),
+					shiftModifier: keyboard.addKey(KeyCodes.SHIFT),
 				};
 			}
 		}

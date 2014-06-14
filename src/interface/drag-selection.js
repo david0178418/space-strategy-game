@@ -16,6 +16,7 @@ define(function(require) {
 		this.visible = false;
 		this.startSelection = false;
 		this.mousePointer = game.input.mousePointer;
+		this.controls = instanceManager.get('controls');
 		game.add.existing(this);
 	}
 	
@@ -103,7 +104,7 @@ define(function(require) {
 				entity = selectedEntities[i];
 				xDiff = avgX - entity.x;
 				yDiff = avgY - entity.y;
-				entity.rightClickHandler(x - xDiff, y - yDiff);
+				entity.rightClickHandler(x - xDiff, y - yDiff, this.controls.shiftModifier.isDown);
 			}
 		},
 	});

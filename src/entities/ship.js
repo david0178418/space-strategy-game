@@ -54,8 +54,8 @@ define(function(require) {
 				update: function() {
 					this.updateSelectionGraphic();
 				},
-				rightClickHandler: function(x, y) {
-					this.moveTo(x, y);
+				rightClickHandler: function(x, y, shiftIsDown) {
+					this.moveTo(x, y, shiftIsDown);
 				}
 			}
 		);
