@@ -18,6 +18,9 @@ define(function(require) {
 		this.mousePointer = game.input.mousePointer;
 		this.controls = instanceManager.get('controls');
 		game.add.existing(this);
+		
+		// TODO Remove debug
+		window.dragSelection = this;
 	}
 	
 	DragSelection.prototype = Object.create(Phaser.Graphics.prototype);
@@ -56,7 +59,7 @@ define(function(require) {
 					entity = this.selectableEntities[i];
 					
 					if(entity.isSelectable) {
-						if(this.area.intersects(entity.getBounds())) {
+						if(this.getBounds().intersects(entity.getBounds())) {
 							entity.select();
 						} else if(entity.isSelected) {
 							entity.deselect();
