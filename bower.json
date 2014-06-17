@@ -19,6 +19,6 @@
   "dependencies": {
     "requirejs": "latest",
     "lodash": "latest",
-    "phaser-official": "latest"
+    "phaser": "git://github.com/david0178418/phaser.git#master"
   }
 }
