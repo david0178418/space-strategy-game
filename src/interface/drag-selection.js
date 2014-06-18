@@ -9,7 +9,7 @@ define(function(require) {
 		Phaser.Graphics.call(this, game, 0, 0);
 		
 		this.area = new Phaser.Rectangle(0, 0, 1, 1);
-		this.selectableEntities = game.world.children;
+		this.selectableEntities = instanceManager.get('worldEntities');
 		this.endPoint = new Phaser.Point();
 		this.mouse = game.input.mouse;
 		this.alpha = 0.25;
@@ -56,7 +56,7 @@ define(function(require) {
 				entitiesLength = this.selectableEntities.length;
 					
 				for(i = 0; i < entitiesLength; i++) {
-					entity = this.selectableEntities[i];
+					entity = this.selectableEntities.getAt(i);
 					
 					if(entity.isSelectable) {
 						if(this.getBounds().intersects(entity.getBounds())) {

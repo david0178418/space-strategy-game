@@ -1,6 +1,7 @@
 define(function(require) {
 	"use strict";
 	var CONFIG = require('config'),
+		_ = require('lodash'),
 		Phaser = require('phaser'),
 		States = require('states'),
 		Planet = require('entities/planet'),
@@ -11,25 +12,42 @@ define(function(require) {
 		instanceManager = require('instance-manager'),
 		game = instanceManager.get('game');
 	
-	var PanSpeed = 8;
+	var PanSpeed = 8,
+		MinSize = 0.25,
+		MaxSize = 3,
+		ScaleIncrement = 0.25;
 	
 	States.Play = 'play';
 	game.state.add(States.Play, {
+		_zoomTween: null,
+		_zoomTarget: 1,
+		
+		worldEntities: null,
+		
 		preload: function(game) {
 			Hud.preload(game);
 			Beam.preload(game);
 		},
 		create: function(game) {
-			game.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
-			game.scale.setShowAll();
-			game.scale.pageAlignHorizontally = true;
-			game.scale.pageAlignVeritcally = true;
-			game.scale.refresh();
-
-			window.addEventListener('resize', function() {
-				game.scale.setShowAll();
-				game.scale.refresh();
-			});
+			game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+			game.scale.setScreenSize();
+			window.worldEntities = this.worldEntities = instanceManager.get('worldEntities');
+			
+			window.addEventListener('mousewheel', _.bind(function(e) {
+				this._zoomTarget += ScaleIncrement * (e.wheelDelta > 0 ? 1 : -1);
+				
+				if(this._zoomTarget < MinSize || this._zoomTarget > MaxSize) {
+					return;
+				}
+				
+				if(this._zoomTween) {
+					this._zoomTween.stop();
+				}
+				
+				this._zoomTween = game.add.tween(this.worldEntities.scale).to({x:this._zoomTarget, y:this._zoomTarget}, 200);
+				
+				this._zoomTween.start();
+			}, this));
 
 			game.world.setBounds(0, 0, CONFIG.stage.width, CONFIG.stage.height);
 			
@@ -41,10 +59,16 @@ define(function(require) {
 			this.ship1 = new Ship({x: 100, y: 100});
 			this.ship2 = new Ship({x: 150, y:150});
 			
+			this.worldEntities.add(this.planet1);
+			this.worldEntities.add(this.planet2);
+			this.worldEntities.add(this.ship1);
+			this.worldEntities.add(this.ship2);
+			
 			this.dragSelection = new DragSelection(this.select);
 			this.controls = instanceManager.get('controls');
 		},
 		update: function(game) {
+			
 			var controls = this.controls;
 			
 			if(controls.panUp.isDown) {

@@ -31,8 +31,11 @@ define(function(require) {
 			}
 			
 			//TODO Remove manual position update once made a child
-			this._selectionGraphic.x = this.x;
-			this._selectionGraphic.y = this.y;
+			this._selectionGraphic.x = this.world.x;
+			this._selectionGraphic.y = this.world.y;
+			
+			this._selectionGraphic.scale.x = this.parent.scale.x;
+			this._selectionGraphic.scale.y = this.parent.scale.y;
 		},
 
 		toggleSelection: function() {

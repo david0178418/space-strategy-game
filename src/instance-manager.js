@@ -25,6 +25,14 @@ define(function(require, exports) {
 			}
 		},
 		
+		worldEntities: {
+			init: function() {
+				//TODO: Remove global debug
+				var worldEntities = window.worldEntities = instanceManager.get('group');
+				
+				return worldEntities;
+			}	
+		},
 		
 		//TODO less ghetto way of collecting all targetables
 		// since entities can only exist in one group at a time
