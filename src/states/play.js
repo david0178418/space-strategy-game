@@ -69,25 +69,42 @@ define(function(require) {
 			this.controls = instanceManager.get('controls');
 		},
 		update: function(game) {
+			// Vertial pan
 			if(this.controls.panUp.isDown) {
 				this.worldEntities.y += this._panSpeed;
 			} else if(this.controls.panDown.isDown) {
 				this.worldEntities.y -= this._panSpeed;
 			}
 
+			// Horizontal pa
 			if(this.controls.panRight.isDown) {
 				this.worldEntities.x -= this._panSpeed;
 			} else if(this.controls.panLeft.isDown) {
 				this.worldEntities.x += this._panSpeed;
 			}
+			
+			// Limit view
+			// Run check each tick to account for
+			// other position mutators such as zooming
+			if(this.worldEntities.y > 0) {
+				this.worldEntities.y = 0;
+			} else if(this.worldEntities.y < -(this.world.height * this.worldEntities.scale.y - game.camera.height)) {
+				this.worldEntities.y = -(this.world.height * this.worldEntities.scale.y - game.camera.height);
+			}
+			
+			if(this.worldEntities.x < -(this.world.width * this.worldEntities.scale.x - game.camera.width)) {
+				this.worldEntities.x = -(this.world.width * this.worldEntities.scale.x - game.camera.width);
+			} else if(this.worldEntities.x > 0) {
+				this.worldEntities.x = 0;
+			}
 		},
 
 		updateZoom: function() {
 			var zoom = this._zoomTarget / 100,
-				newPivot = this.game.input.getLocalPosition(this.worldEntities, game.input.mousePointer);
+				localPosition = this.game.input.getLocalPosition(this.worldEntities, game.input.mousePointer);
 
-			this.worldEntities.position.x += newPivot.x * (this.worldEntities.scale.x - zoom);
-			this.worldEntities.position.y += newPivot.y * (this.worldEntities.scale.y - zoom);
+			this.worldEntities.position.x += localPosition.x * (this.worldEntities.scale.x - zoom);
+			this.worldEntities.position.y += localPosition.y * (this.worldEntities.scale.y - zoom);
 			this.worldEntities.scale.setTo(zoom);
 		},
 

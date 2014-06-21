@@ -9,7 +9,7 @@ define(function(require) {
 		Phaser.Graphics.call(this, game, 0, 0);
 
 		this.area = new Phaser.Rectangle(0, 0, 1, 1);
-		this.selectableEntities = instanceManager.get('worldEntities');
+		this.worldEntities = instanceManager.get('worldEntities');
 		this.endPoint = new Phaser.Point();
 		this.mouse = game.input.mouse;
 		this.alpha = 0.25;
@@ -31,7 +31,8 @@ define(function(require) {
 				entity,
 				entitiesLength,
 				dragX,
-				dragY;
+				dragY,
+				localPoint;
 
 			if(this.mouse.button === 0) {
 				dragX = this.mousePointer.worldX;
@@ -53,10 +54,10 @@ define(function(require) {
 				this.area.width = dragX - this.position.x;
 				this.area.height = dragY - this.position.y;
 
-				entitiesLength = this.selectableEntities.length;
+				entitiesLength = this.worldEntities.length;
 
 				for(i = 0; i < entitiesLength; i++) {
-					entity = this.selectableEntities.getAt(i);
+					entity = this.worldEntities.getAt(i);
 
 					if(entity.isSelectable) {
 						if(this.getBounds().intersects(entity.getBounds())) {
@@ -69,8 +70,10 @@ define(function(require) {
 			} else if(this.mouse.button === 2) {
 				this.registerRightClick = true;
 			} else if(this.registerRightClick) {
+				localPoint = this.game.input.getLocalPosition(this.worldEntities, this.game.input.mousePointer);
 				this.registerRightClick = false;
-				this.sendRightClick(this.mousePointer.worldX, this.mousePointer.worldY);
+				
+				this.sendRightClick(localPoint.x, localPoint.y);
 			} else if(this.startSelection) {
 				this.startSelection = false;
 				this.visible = false;
@@ -89,8 +92,8 @@ define(function(require) {
 				yTotal = 0,
 				selectedEntities = [];
 
-			for(i = 0; i < this.selectableEntities.length; i++) {
-				entity = this.selectableEntities.getAt(i);
+			for(i = 0; i < this.worldEntities.length; i++) {
+				entity = this.worldEntities.getAt(i);
 
 				if(entity.isSelected) {
 					selectedEntities.push(entity);
