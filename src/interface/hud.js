@@ -8,19 +8,19 @@ define(function(require) {
 	function Hud() {
 		this.game = instanceManager.get('game');
 		this.meteorController = instanceManager.get('meteorController');
-		
+
 		this.currentScore = this.meteorController.killCount;
-		
+
 		this.scoreMsg = this.game.add.text(20, 20, 'Score: '+this.meteorController.killCount, {
 			font: '30px Arial',
 			fill: '#ff0044',
 			align: 'left'
 		});
-		
+
 		this.scoreMsg.fixedToCamera = true;
 		this.healthMsg.fixedToCamera = true;
 		this.powerMsg.fixedToCamera = true;
-		
+
 		window.hud = this;	//debug
 	}
 
@@ -32,9 +32,9 @@ define(function(require) {
 			}
 		}
 	};
-	
+
 	Hud.preload = function(game) {
-		
+
 	};
 
 	return Hud;

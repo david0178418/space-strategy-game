@@ -7,7 +7,7 @@ define(function(require) {
 	function DragSelection(props) {
 		var game = instanceManager.get('game');
 		Phaser.Graphics.call(this, game, 0, 0);
-		
+
 		this.area = new Phaser.Rectangle(0, 0, 1, 1);
 		this.selectableEntities = instanceManager.get('worldEntities');
 		this.endPoint = new Phaser.Point();
@@ -18,11 +18,11 @@ define(function(require) {
 		this.mousePointer = game.input.mousePointer;
 		this.controls = instanceManager.get('controls');
 		game.add.existing(this);
-		
+
 		// TODO Remove debug
 		window.dragSelection = this;
 	}
-	
+
 	DragSelection.prototype = Object.create(Phaser.Graphics.prototype);
 	_.extend(DragSelection.prototype, {
 		constructor: DragSelection,
@@ -32,11 +32,11 @@ define(function(require) {
 				entitiesLength,
 				dragX,
 				dragY;
-			
+
 			if(this.mouse.button === 0) {
 				dragX = this.mousePointer.worldX;
 				dragY = this.mousePointer.worldY;
-				
+
 				if(!this.startSelection) {
 					this.startSelection = true;
 					this.visible = true;
@@ -44,7 +44,7 @@ define(function(require) {
 					this.area.x = dragX - 10;
 					this.area.y = dragY - 10;
 				}
-				
+
 				this.clear();
 				this.lineStyle(3, 0xFFFF0B);
 				this.beginFill(0xFFFF0B);
@@ -52,12 +52,12 @@ define(function(require) {
 				this.endFill();
 				this.area.width = dragX - this.position.x;
 				this.area.height = dragY - this.position.y;
-				
+
 				entitiesLength = this.selectableEntities.length;
-					
+
 				for(i = 0; i < entitiesLength; i++) {
 					entity = this.selectableEntities.getAt(i);
-					
+
 					if(entity.isSelectable) {
 						if(this.getBounds().intersects(entity.getBounds())) {
 							entity.select();
@@ -74,10 +74,10 @@ define(function(require) {
 			} else if(this.startSelection) {
 				this.startSelection = false;
 				this.visible = false;
-				
+
 			}
 		},
-		
+
 		sendRightClick: function(x, y) {
 			var i,
 				entity,
@@ -88,10 +88,10 @@ define(function(require) {
 				xTotal = 0,
 				yTotal = 0,
 				selectedEntities = [];
-			
+
 			for(i = 0; i < this.selectableEntities.length; i++) {
-				entity = this.selectableEntities[i];
-				
+				entity = this.selectableEntities.getAt(i);
+
 				if(entity.isSelected) {
 					selectedEntities.push(entity);
 
@@ -99,10 +99,10 @@ define(function(require) {
 					yTotal += entity.y;
 				}
 			}
-			
+
 			avgX = xTotal / selectedEntities.length;
 			avgY = yTotal / selectedEntities.length;
-			
+
 			for(i = 0; i < selectedEntities.length; i++) {
 				entity = selectedEntities[i];
 				xDiff = avgX - entity.x;
@@ -111,7 +111,7 @@ define(function(require) {
 			}
 		},
 	});
-	
+
 	window.DragSelection = DragSelection;
 	return DragSelection;
 });
