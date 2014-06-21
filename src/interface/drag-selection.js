@@ -98,8 +98,10 @@ define(function(require) {
 				if(entity.isSelected) {
 					selectedEntities.push(entity);
 
-					xTotal += entity.x;
-					yTotal += entity.y;
+					if(entity.movable) {
+						xTotal += entity.x;
+						yTotal += entity.y;
+					}
 				}
 			}
 
