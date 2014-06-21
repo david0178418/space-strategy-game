@@ -69,17 +69,15 @@ define(function(require) {
 			this.controls = instanceManager.get('controls');
 		},
 		update: function(game) {
-			var controls = this.controls;
-
-			if(controls.panUp.isDown) {
+			if(this.controls.panUp.isDown) {
 				this.worldEntities.y += this._panSpeed;
-			} else if(controls.panDown.isDown) {
+			} else if(this.controls.panDown.isDown) {
 				this.worldEntities.y -= this._panSpeed;
 			}
 
-			if(controls.panRight.isDown) {
+			if(this.controls.panRight.isDown) {
 				this.worldEntities.x -= this._panSpeed;
-			} else if(controls.panLeft.isDown) {
+			} else if(this.controls.panLeft.isDown) {
 				this.worldEntities.x += this._panSpeed;
 			}
 		},
