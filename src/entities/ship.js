@@ -45,7 +45,6 @@ define(function(require) {
 			targetClosestComponent, {
 				constructor: Ship,
 				update: function() {
-					this.updateSelectionGraphic();
 				},
 				rightClickHandler: function(x, y, shiftIsDown) {
 					this.moveTo(x, y, shiftIsDown);

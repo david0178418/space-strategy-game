@@ -26,7 +26,6 @@ define(function(require) {
 		selectableComponent, {
 			constructor: Planet,
 			update: function() {
-				this.updateSelectionGraphic();
 			},
 		}
 	);

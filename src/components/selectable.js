@@ -23,12 +23,6 @@ define(function(require) {
 			this.addChild(this._selectionGraphic);
 		},
 
-		updateSelectionGraphic: function() {
-			if(!this._selectionGraphic.visible) {
-				return;
-			}
-		},
-
 		toggleSelection: function() {
 			if(this.isSelected) {
 				this.unselect();

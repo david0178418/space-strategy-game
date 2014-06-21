@@ -118,15 +118,27 @@ define(function(require) {
 	
 	//Dummy graphics rendering functions
 	function renderShip(game) {
-		var ship = game.add.bitmapData(30, 30, 'ship', true);
+		var ship = game.add.bitmapData(40, 30, 'ship', true);
 		
 		ship.context.beginPath();
-		ship.context.setLineWidth(5);
+		ship.context.setLineWidth(2);
 		ship.context.strokeStyle = "#eeeeee";
-		ship.context.lineTo(30, 15);
+		ship.context.lineTo(25, 0);
+		ship.context.lineTo(0, 0)
+		ship.context.lineTo(0, 30);
+		ship.context.lineTo(25, 30);
+		ship.context.lineTo(0, 30);
+		ship.context.lineTo(40, 15);
+		ship.context.lineTo(0, 0);
+		ship.context.stroke();
+		
+		ship.context.beginPath();
+		ship.context.fillStyle = "#444444";
+		ship.context.lineTo(40, 15);
 		ship.context.lineTo(0, 30);
 		ship.context.lineTo(0, 0);
-		ship.context.lineTo(30, 15);
-		ship.context.stroke();
+		ship.context.lineTo(40, 15);
+		
+		ship.context.fill();
 	}
 });
