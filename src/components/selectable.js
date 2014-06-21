@@ -17,25 +17,16 @@ define(function(require) {
 				.endFill();
 
 			this._selectionGraphic.visible = false;
-
+			
 			//TODO Change to a child once real sprites are used
 			// due to scaling wierdness
-			this._selectionGraphic.x = this.x;
-			this._selectionGraphic.y = this.y;
-			this.game.add.existing(this._selectionGraphic);
+			this.addChild(this._selectionGraphic);
 		},
 
 		updateSelectionGraphic: function() {
 			if(!this._selectionGraphic.visible) {
 				return;
 			}
-			
-			//TODO Remove manual position update once made a child
-			this._selectionGraphic.x = this.world.x;
-			this._selectionGraphic.y = this.world.y;
-			
-			this._selectionGraphic.scale.x = this.parent.scale.x;
-			this._selectionGraphic.scale.y = this.parent.scale.y;
 		},
 
 		toggleSelection: function() {
@@ -46,17 +37,12 @@ define(function(require) {
 			}
 		},
 
-		select: function(target) {
+		select: function() {
 			this.isSelected = true;
-			
-			//TODO Remove manual position update once made a child
-			this._selectionGraphic.x = this.x;
-			this._selectionGraphic.y = this.y;
-			
 			this._selectionGraphic.visible = true;
 		},
 
-		deselect: function(target) {
+		deselect: function() {
 			this.isSelected = false;
 			this._selectionGraphic.visible = false;
 		},

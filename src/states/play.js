@@ -26,6 +26,10 @@ define(function(require) {
 		preload: function(game) {
 			Hud.preload(game);
 			Beam.preload(game);
+			Ship.preload(game);
+			
+			// Temp render functions
+			renderShip(game);
 		},
 		
 		create: function(game) {
@@ -111,4 +115,18 @@ define(function(require) {
 		paused: function() {
 		},
 	});
+	
+	//Dummy graphics rendering functions
+	function renderShip(game) {
+		var ship = game.add.bitmapData(30, 30, 'ship', true);
+		
+		ship.context.beginPath();
+		ship.context.setLineWidth(5);
+		ship.context.strokeStyle = "#eeeeee";
+		ship.context.moveTo(0, 30);
+		ship.context.lineTo(30, 30);
+		ship.context.lineTo(15, 0);
+		ship.context.lineTo(0, 30);
+		ship.context.stroke();
+	}
 });

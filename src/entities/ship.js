@@ -12,16 +12,9 @@ define(function(require) {
 	
 	function Ship(props) {
 		var game = instanceManager.get('game');
-		Phaser.Sprite.call(this, game, props.x, props.y, 'ship');
-		
-		// XXX TEMP SIZE FOR PLACEHOLDER
-		this.width = 10;
-		this.height = 10;
-		// END
+		Phaser.Sprite.call(this, game, props.x, props.y, game.cache.getBitmapData('ship'));
 		
 		this.anchor.setTo(0.5, 0.5);
-		//this.revive(Ship.HEALTH);
-		
 		game.physics.enable(this, Phaser.Physics.ARCADE);
 		this.initSelectable();
 		
@@ -39,7 +32,7 @@ define(function(require) {
 	};
 	
 	Ship.preload = function(game) {
-		game.load.image('ship', '');
+		//game.load.image('ship', '');
 	};
 	
 	Ship.prototype = Object.create(Phaser.Sprite.prototype);

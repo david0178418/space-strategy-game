@@ -1,11 +1,11 @@
 {
     "passfail"      : false,
     "browser"       : true,
-    "predef"        : [  // Extra globals.
-        "require",
-		"requirejs",
-        "define"
-    ],
+    "globals"        : {  // Extra globals.
+        "require": false,
+		"requirejs": false,
+        "define": false
+	},
     "debug"         : false,
     "devel"         : true,
     "es5"           : true,
