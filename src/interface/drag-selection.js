@@ -4,20 +4,23 @@ define(function(require) {
 		Phaser = require('phaser'),
 		instanceManager = require('instance-manager');
 
-	function DragSelection(props) {
+	function DragSelection() {
 		var game = instanceManager.get('game');
 		Phaser.Graphics.call(this, game, 0, 0);
 
-		this.area = new Phaser.Rectangle(0, 0, 1, 1);
 		this.worldEntities = instanceManager.get('worldEntities');
 		this.endPoint = new Phaser.Point();
 		this.mouse = game.input.mouse;
 		this.alpha = 0.25;
 		this.visible = false;
+		this.entitySelected = false;
+		this.startDrag = false;
 		this.startSelection = false;
 		this.mousePointer = game.input.mousePointer;
 		this.controls = instanceManager.get('controls');
 		game.add.existing(this);
+		
+		this.x = this.y = -500;
 
 		// TODO Remove debug
 		window.dragSelection = this;
@@ -42,8 +45,21 @@ define(function(require) {
 					this.startSelection = true;
 					this.visible = true;
 					this.position.set(dragX - 10, dragY - 10);
-					this.area.x = dragX - 10;
-					this.area.y = dragY - 10;
+					
+					// TODO: One pass at drawing upon selection start to
+					// get correct bounds before the graphics have been rendered
+					// DRY up at a later time.
+					this.clear();
+					this.lineStyle(3, 0xFFFF0B);
+					this.beginFill(0xFFFF0B);
+					this.drawRect(0, 0, dragX - this.position.x, dragY - this.position.y);
+					this.endFill();
+					return;
+				} else if(!this.startDrag && (
+						(dragX - this.position.x) > 10 || (dragY - this.position.y) > 10
+					)
+				) {
+					this.startDrag = true;
 				}
 
 				this.clear();
@@ -51,16 +67,17 @@ define(function(require) {
 				this.beginFill(0xFFFF0B);
 				this.drawRect(0, 0, dragX - this.position.x, dragY - this.position.y);
 				this.endFill();
-				this.area.width = dragX - this.position.x;
-				this.area.height = dragY - this.position.y;
 
 				entitiesLength = this.worldEntities.length;
+				
+				this.entitySelected = false;
 
 				for(i = 0; i < entitiesLength; i++) {
 					entity = this.worldEntities.getAt(i);
 
 					if(entity.isSelectable) {
-						if(this.getBounds().intersects(entity.getBounds())) {
+						if((this.startDrag || !this.entitySelected) && this.getBounds().intersects(entity.getBounds()) ) {
+							this.entitySelected = true;
 							entity.select();
 						} else if(entity.isSelected) {
 							entity.deselect();
@@ -76,6 +93,7 @@ define(function(require) {
 				this.sendRightClick(localPoint.x, localPoint.y);
 			} else if(this.startSelection) {
 				this.startSelection = false;
+				this.startDrag = false;
 				this.visible = false;
 
 			}

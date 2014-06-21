@@ -15,12 +15,9 @@ define(function(require) {
 		Phaser.Sprite.call(this, game, props.x, props.y, game.cache.getBitmapData('ship'));
 		
 		this.anchor.setTo(0.5, 0.5);
-		game.physics.enable(this, Phaser.Physics.ARCADE);
 		this.initSelectable();
 		
-		this.moveTween = this.game.add.tween(this);
 		this.speed = 100
-		game.add.existing(this);
 	}
 	
 	Ship.COOLDOWN = 1800;

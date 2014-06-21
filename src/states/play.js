@@ -46,6 +46,8 @@ define(function(require) {
 
 				if(this._zoomTarget >= this._zoomMin && this._zoomTarget <= this._zoomMax) {
 					this.updateZoom();
+				} else {
+					this._zoomTarget = e.wheelDelta > 0 ? this._zoomMax : this._zoomMin;
 				}
 
 			}, this));
@@ -53,12 +55,14 @@ define(function(require) {
 			game.world.setBounds(0, 0, CONFIG.stage.width, CONFIG.stage.height);
 			game.stage.backgroundColor = '#333';
 			
-			this.planet1 = new Planet({x: 0, y: 0});
-			this.planet2 = new Planet({x: 0, y: CONFIG.stage.height / 2});
-			this.ship1 = new Ship({x: 100, y: 100});
-			this.ship2 = new Ship({x: 150, y:150});
-			this.worldEntities.add(this.planet1);
-			this.worldEntities.add(this.planet2);
+			this.worldEntities.add(new Ship({x: 100, y: 100}));
+			this.worldEntities.add(new Ship({x: 150, y:150}));
+			this.worldEntities.add(new Ship({x: 50, y: 150}));
+			this.worldEntities.add(new Ship({x: 150, y:50}));
+			
+			//planets acting as markers to edges and center
+			this.worldEntities.add(new Planet({x: 0, y: CONFIG.stage.height / 2}));
+			this.worldEntities.add(new Planet({x: 0, y: 0}));
 			this.worldEntities.add(new Planet({x: CONFIG.stage.width / 2, y: CONFIG.stage.height / 2}));
 			this.worldEntities.add(new Planet({x: CONFIG.stage.width / 2, y: 0}));
 			this.worldEntities.add(new Planet({x: CONFIG.stage.width, y: CONFIG.stage.height / 2}));
@@ -66,8 +70,8 @@ define(function(require) {
 			this.worldEntities.add(new Planet({x: 0, y: CONFIG.stage.height}));
 			this.worldEntities.add(new Planet({x: CONFIG.stage.width, y: 0}));
 			this.worldEntities.add(new Planet({x: CONFIG.stage.width, y: CONFIG.stage.height}));
-			this.worldEntities.add(this.ship1);
-			this.worldEntities.add(this.ship2);
+			
+			generatePlanets();
 
 			this.dragSelection = new DragSelection(this.select);
 			this.controls = instanceManager.get('controls');
@@ -115,6 +119,11 @@ define(function(require) {
 		paused: function() {
 		},
 	});
+	
+	
+	function generatePlanets() {
+		
+	}
 	
 	//Dummy graphics rendering functions
 	function renderShip(game) {

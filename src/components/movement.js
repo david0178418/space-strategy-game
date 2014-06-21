@@ -6,6 +6,7 @@ define(function(require) {
 
 	return {
 		_paths: null,
+		_lineThickness: 2,
 		moving: false,
 		movable: true,
 		
@@ -24,8 +25,9 @@ define(function(require) {
 					to({
 						x:x,
 						y:y,
-					}, time, Phaser.Easing.Quadratic.InOut);
+					}, time);
 			
+			pathGraphic.alpha = 0.5;
 			this._paths = this._paths || [];
 			
 			if(!queueMovement) {
@@ -51,7 +53,7 @@ define(function(require) {
 				rotation: Phaser.Point.angle(endPoint, startingPoint),
 			}, 500);
 			
-			pathGraphic.lineStyle(3, 0x33ff33, 0.6);
+			pathGraphic.lineStyle(this._lineThickness, 0x33ff33, 0.6);
 			pathGraphic.position.x = 0;
 			pathGraphic.position.y = 0;
 			pathGraphic.moveTo(startingPoint.x, startingPoint.y);
@@ -61,7 +63,7 @@ define(function(require) {
 			moveTween
 				.onUpdateCallback(function() {
 					pathGraphic.clear();
-					pathGraphic.lineStyle(3, 0x33ff33, 0.6);
+					pathGraphic.lineStyle(this._lineThickness, 0x33ff33, 0.6);
 					pathGraphic.position.x = 0;
 					pathGraphic.position.y = 0;
 					pathGraphic.moveTo(this.position.x, this.position.y);
@@ -80,7 +82,7 @@ define(function(require) {
 					}, this);
 				}, this);
 			
-			if(queueMovement) {
+			if(queueMovement && lastPath) {
 				lastPath.move.onComplete.add(function() {
 					moveTween.start();
 					rotationTween.start();	
