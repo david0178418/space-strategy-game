@@ -73,15 +73,15 @@ define(function(require) {
 			var controls = this.controls;
 
 			if(controls.panUp.isDown) {
-				game.camera.y -= PanSpeed;
+				this.worldEntities.y += PanSpeed;
 			} else if(controls.panDown.isDown) {
-				game.camera.y += PanSpeed;
+				this.worldEntities.y -= PanSpeed;
 			}
 
 			if(controls.panRight.isDown) {
-				game.camera.x += PanSpeed;
+				this.worldEntities.x -= PanSpeed;
 			} else if(controls.panLeft.isDown) {
-				game.camera.x -= PanSpeed;
+				this.worldEntities.x += PanSpeed;
 			}
 		},
 
