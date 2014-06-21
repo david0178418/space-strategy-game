@@ -123,10 +123,10 @@ define(function(require) {
 		ship.context.beginPath();
 		ship.context.setLineWidth(5);
 		ship.context.strokeStyle = "#eeeeee";
-		ship.context.moveTo(0, 30);
-		ship.context.lineTo(30, 30);
-		ship.context.lineTo(15, 0);
+		ship.context.lineTo(30, 15);
 		ship.context.lineTo(0, 30);
+		ship.context.lineTo(0, 0);
+		ship.context.lineTo(30, 15);
 		ship.context.stroke();
 	}
 });

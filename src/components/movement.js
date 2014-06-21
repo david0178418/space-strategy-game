@@ -22,8 +22,12 @@ define(function(require) {
 				tween(this).
 				to({
 					x:x,
-					y:y
+					y:y,
 				}, time, Phaser.Easing.Quadratic.InOut, true, delay);
+			
+			this.game.add.tween(this).to({
+				rotation: this.game.physics.arcade.angleToXY(this, x, y),
+			}, 500).start();
 		},
 	};
 });
