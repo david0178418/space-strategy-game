@@ -12,12 +12,11 @@ define(function(require) {
 		instanceManager = require('instance-manager'),
 		game = instanceManager.get('game');
 
-	var PanSpeed = 8,
-		MinSize = 25,
-		MaxSize = 300;
-
 	States.Play = 'play';
 	game.state.add(States.Play, {
+		_zoomMax: 300,
+		_zoomMin: 25,
+		_panSpeed: 8,
 		_zoomSpeed: 25,	//% per second
 		_zoomTween: null,
 		_zoomTarget: 100,	//%
@@ -41,7 +40,7 @@ define(function(require) {
 
 				this._zoomTarget += this._zoomIncrement * (e.wheelDelta > 0 ? 1 : -1);
 
-				if(this._zoomTarget >= MinSize && this._zoomTarget <= MaxSize) {
+				if(this._zoomTarget >= this._zoomMin && this._zoomTarget <= this._zoomMax) {
 					this.updateZoom();
 				}
 
@@ -73,15 +72,15 @@ define(function(require) {
 			var controls = this.controls;
 
 			if(controls.panUp.isDown) {
-				this.worldEntities.y += PanSpeed;
+				this.worldEntities.y += this._panSpeed;
 			} else if(controls.panDown.isDown) {
-				this.worldEntities.y -= PanSpeed;
+				this.worldEntities.y -= this._panSpeed;
 			}
 
 			if(controls.panRight.isDown) {
-				this.worldEntities.x -= PanSpeed;
+				this.worldEntities.x -= this._panSpeed;
 			} else if(controls.panLeft.isDown) {
-				this.worldEntities.x += PanSpeed;
+				this.worldEntities.x += this._panSpeed;
 			}
 		},
 
