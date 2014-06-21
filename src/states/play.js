@@ -91,7 +91,6 @@ define(function(require) {
 
 			this.worldEntities.position.x += newPivot.x * (this.worldEntities.scale.x - zoom);
 			this.worldEntities.position.y += newPivot.y * (this.worldEntities.scale.y - zoom);
-
 			this.worldEntities.scale.setTo(zoom);
 		},
 
