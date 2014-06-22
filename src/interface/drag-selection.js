@@ -56,7 +56,7 @@ define(function(require) {
 					this.endFill();
 					return;
 				} else if(!this.startDrag && (
-						(dragX - this.position.x) > 10 || (dragY - this.position.y) > 10
+						Math.abs(dragX - this.position.x) > 10 || Math.abs(dragY - this.position.y) > 10
 					)
 				) {
 					this.startDrag = true;

@@ -2,6 +2,7 @@ define(function(require) {
 	"use strict";
 	var _ = require('lodash'),
 		Phaser = require('phaser'),
+		EntityBase = require('entity-base'),
 		damageComponent = require('components/damage'),
 		gunComponent = require('components/gun'),
 		laserGunComponent = require('components/laser-gun'),
@@ -12,12 +13,9 @@ define(function(require) {
 	
 	function Ship(props) {
 		var game = instanceManager.get('game');
-		Phaser.Sprite.call(this, game, props.x, props.y, game.cache.getBitmapData('ship'));
-		
-		this.anchor.setTo(0.5, 0.5);
-		this.initSelectable();
-		
-		this.speed = 100
+		props.graphic = game.cache.getBitmapData('ship');
+		EntityBase.call(this, props);
+		this.speed = 100;
 	}
 	
 	Ship.COOLDOWN = 1800;
@@ -29,7 +27,6 @@ define(function(require) {
 	};
 	
 	Ship.preload = function(game) {
-		//game.load.image('ship', '');
 	};
 	
 	Ship.prototype = Object.create(Phaser.Sprite.prototype);

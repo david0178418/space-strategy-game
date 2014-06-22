@@ -8,7 +8,7 @@ define(function(require) {
 		isSelectable: true,
 		isSelected: false,
 
-		initSelectable: function() {
+		initComponentSelectable: function() {
 			this._selectionGraphic = new Phaser.Graphics(this.game, 0, 0);
 			this._selectionGraphic
 				.lineStyle(3, 0xff3333, 0.6)
