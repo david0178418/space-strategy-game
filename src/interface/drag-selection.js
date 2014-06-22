@@ -108,6 +108,7 @@ define(function(require) {
 				yDiff,
 				xTotal = 0,
 				yTotal = 0,
+				movableSelectedCount = 0,
 				selectedEntities = [];
 
 			for(i = 0; i < this.worldEntities.length; i++) {
@@ -117,14 +118,15 @@ define(function(require) {
 					selectedEntities.push(entity);
 
 					if(entity.movable) {
+						movableSelectedCount++;
 						xTotal += entity.x;
 						yTotal += entity.y;
 					}
 				}
 			}
 
-			avgX = xTotal / selectedEntities.length;
-			avgY = yTotal / selectedEntities.length;
+			avgX = xTotal / movableSelectedCount;
+			avgY = yTotal / movableSelectedCount;
 
 			for(i = 0; i < selectedEntities.length; i++) {
 				entity = selectedEntities[i];

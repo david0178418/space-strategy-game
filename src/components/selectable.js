@@ -11,7 +11,7 @@ define(function(require) {
 		initComponentSelectable: function() {
 			this._selectionGraphic = new Phaser.Graphics(this.game, 0, 0);
 			this._selectionGraphic
-				.lineStyle(3, 0xff3333, 0.6)
+				.lineStyle(5, 0xff3333, 0.6)
 				.moveTo(0, 0)
 				.drawCircle(0, 0, (this.width/2) + this._radiusBuffer)
 				.endFill();

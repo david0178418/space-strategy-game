@@ -120,10 +120,10 @@ define(function(require) {
 				this.worldEntities.x = 0;
 			}
 			
-			this.background1layer1.position.x = this.background1layer1.width * .005  * this.worldEntities.x / game.width;
-			this.background1layer1.position.y = this.background1layer1.height * .005 * this.worldEntities.y / game.height;
-			this.background1layer2.position.x = this.background1layer2.width * .01 * this.worldEntities.x / game.width;
-			this.background1layer2.position.y = this.background1layer2.height * .01* this.worldEntities.y / game.height;
+			this.background1layer1.position.x = this.background1layer1.width * 0.005  * this.worldEntities.x / game.width;
+			this.background1layer1.position.y = this.background1layer1.height * 0.005 * this.worldEntities.y / game.height;
+			this.background1layer2.position.x = this.background1layer2.width * 0.01 * this.worldEntities.x / game.width;
+			this.background1layer2.position.y = this.background1layer2.height * 0.01* this.worldEntities.y / game.height;
 			
 			
 			/*this.background2layer1.position.x = this.background2layer1.width * .001  * this.worldEntities.x / game.width;

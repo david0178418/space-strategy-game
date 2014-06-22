@@ -11,8 +11,7 @@ define(function(require) {
 		movable: true,
 		
 		moveTo: function(x, y, queueMovement) {
-			var i,
-				lastPath,
+			var lastPath,
 				startingPoint = this.position,
 				endPoint = {
 					x: x,
