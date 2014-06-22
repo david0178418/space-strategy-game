@@ -26,10 +26,11 @@ define(function(require) {
 		preload: function(game) {
 			Hud.preload(game);
 			Beam.preload(game);
-			Ship.preload(game);
+			
 			
 			// Temp render functions
-			renderShip(game);
+			game.load.game.load.spritesheet('planet', renderPlanet(game), 100, 100);
+			game.load.game.load.spritesheet('ship', renderShip(game), 40, 30);
 		},
 		
 		create: function(game) {
@@ -149,5 +150,21 @@ define(function(require) {
 		ship.context.lineTo(40, 15);
 		
 		ship.context.fill();
+		
+		return ship.canvas.toDataURL();
+	}
+	
+	function renderPlanet() {
+		var planet = game.add.bitmapData(100, 100, 'ship', true);
+		
+		planet.context.beginPath();
+		planet.context.setLineWidth(5);
+		planet.context.strokeStyle = "#0093ff";
+		planet.context.fillStyle = "#0ffda7";
+		planet.context.arc(50, 50, 45, 0, 2 * Math.PI);
+		planet.context.stroke();
+		planet.context.fill();
+		
+		return planet.canvas.toDataURL();
 	}
 });

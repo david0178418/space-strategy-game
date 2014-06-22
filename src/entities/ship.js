@@ -12,8 +12,7 @@ define(function(require) {
 		instanceManager = require('instance-manager');
 	
 	function Ship(props) {
-		var game = instanceManager.get('game');
-		props.graphic = game.cache.getBitmapData('ship');
+		props.graphic = 'ship';
 		EntityBase.call(this, props);
 		this.speed = 100;
 	}

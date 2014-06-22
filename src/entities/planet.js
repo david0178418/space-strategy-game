@@ -8,11 +8,6 @@ define(function(require) {
 	function Planet(props) {
 		props.graphic = 'planet';
 		EntityBase.call(this, props);
-		
-		// XXX TEMP SIZE FOR PLACEHOLDER
-		this.width = 50;
-		this.height = 50;
-		// END
 	}
 	
 	Planet.prototype = Object.create(Phaser.Sprite.prototype);
