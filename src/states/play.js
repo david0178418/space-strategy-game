@@ -15,9 +15,8 @@ define(function(require) {
 	States.Play = 'play';
 	game.state.add(States.Play, {
 		_zoomMax: 300,
-		_zoomMin: 25,
+		_zoomMin: 15,
 		_panSpeed: 8,
-		_zoomSpeed: 25,	//% per second
 		_zoomTween: null,
 		_zoomTarget: 100,	//%
 		_zoomIncrement: 5,	//%
@@ -123,7 +122,15 @@ define(function(require) {
 	
 	
 	function generatePlanets() {
+		var i,
+			worldEntities = instanceManager.get('worldEntities');
 		
+		for(i = 0; i < 15; i++) {
+			worldEntities.add(new Planet({
+				x: _.random(100, CONFIG.stage.width - 100),
+				y: _.random(100, CONFIG.stage.height - 100),
+			}));
+		}
 	}
 	
 	//Dummy graphics rendering functions

@@ -2,12 +2,12 @@ define(function() {
 	"use strict";
 	return {
 		screen: {
-			width: 1024,
-			height: 768,
+			width: 1280,
+			height: 720,
 		},
 		stage: {
-			width: 5000,
-			height: 5000,
+			width: 10000,
+			height: 10000,
 		}
 	};
 });
