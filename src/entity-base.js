@@ -17,7 +17,7 @@ define(function(require) {
 		// and "updateComponent"
 		for(key in this) {
 			if(key.indexOf('initComponent') === 0) {
-				this[key]();
+				this[key](props);
 			} else if(key.indexOf('updateComponent') === 0) {
 				this._componentUpdates.push(key);
 			}

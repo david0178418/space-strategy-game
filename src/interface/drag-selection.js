@@ -75,7 +75,7 @@ define(function(require) {
 				for(i = 0; i < entitiesLength; i++) {
 					entity = this.worldEntities.getAt(i);
 
-					if(entity.isSelectable) {
+					if(entity.isSelectable && entity.ownable && entity.isOwnedBy('player')) {
 						if((this.startDrag || !this.entitySelected) && this.getBounds().intersects(entity.getBounds()) ) {
 							this.entitySelected = true;
 							entity.select();

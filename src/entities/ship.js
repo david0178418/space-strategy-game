@@ -6,10 +6,9 @@ define(function(require) {
 		damageComponent = require('components/damage'),
 		gunComponent = require('components/gun'),
 		laserGunComponent = require('components/laser-gun'),
-		targetClosestComponent = require('components/target-closest'),
-		selectableComponent = require('components/selectable'),
 		movementComponent = require('components/movement'),
-		instanceManager = require('instance-manager');
+		ownableComponent = require('components/ownable'),
+		selectableComponent = require('components/selectable');
 	
 	function Ship(props) {
 		props.graphic = 'ship';
@@ -17,25 +16,16 @@ define(function(require) {
 		this.speed = 100;
 	}
 	
-	Ship.COOLDOWN = 1800;
-	Ship.HEALTH = 4;
-	Ship.RANGE = 700;
-	Ship.DIRECTIONS = {
-		EAST: 1,
-		WEST: 2,
-	};
-	
-	Ship.preload = function(game) {
-	};
+	Ship.preload = function() {};
 	
 	Ship.prototype = Object.create(Phaser.Sprite.prototype);
 	_.extend(Ship.prototype,
-			damageComponent, 
+			damageComponent,
 			gunComponent,
 			laserGunComponent,
 			movementComponent,
-			selectableComponent,
-			targetClosestComponent, {
+			ownableComponent,
+			selectableComponent, {
 				constructor: Ship,
 				update: function() {
 				},

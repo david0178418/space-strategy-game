@@ -3,6 +3,7 @@ define(function(require) {
 	var _ = require('lodash'),
 		Phaser = require('phaser'),
 		EntityBase = require('entity-base'),
+		ownableComponent = require('components/ownable'),
 		selectableComponent = require('components/selectable');
 
 	function Planet(props) {
@@ -13,6 +14,7 @@ define(function(require) {
 	Planet.prototype = Object.create(Phaser.Sprite.prototype);
 	_.extend(
 		Planet.prototype,
+		ownableComponent,
 		selectableComponent, {
 			constructor: Planet,
 			update: function() {
