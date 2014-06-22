@@ -6,7 +6,7 @@ define(function(require) {
 
 	return {
 		_paths: null,
-		_lineThickness: 2,
+		_lineThickness: 3,
 		moving: false,
 		movable: true,
 		
