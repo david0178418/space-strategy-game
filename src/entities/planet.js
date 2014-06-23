@@ -1,7 +1,6 @@
 define(function(require) {
 	"use strict";
 	var _ = require('lodash'),
-		Phaser = require('phaser'),
 		EntityBase = require('entity-base'),
 		ownableComponent = require('components/ownable'),
 		selectableComponent = require('components/selectable'),

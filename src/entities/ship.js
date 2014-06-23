@@ -1,7 +1,6 @@
 define(function(require) {
 	"use strict";
 	var _ = require('lodash'),
-		Phaser = require('phaser'),
 		EntityBase = require('entity-base'),
 		damageComponent = require('components/damage'),
 		gunComponent = require('components/gun'),
