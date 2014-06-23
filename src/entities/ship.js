@@ -18,7 +18,7 @@ define(function(require) {
 	
 	Ship.preload = function() {};
 	
-	Ship.prototype = Object.create(Phaser.Sprite.prototype);
+	Ship.prototype = Object.create(EntityBase.prototype);
 	_.extend(Ship.prototype,
 			damageComponent,
 			gunComponent,

@@ -70,9 +70,9 @@ define(function(require) {
 			
 			
 			this.worldEntities.add(new Ship({x: 100, y: 100, ownedBy: 'player'}));
-			this.worldEntities.add(new Ship({x: 150, y:150}));
-			this.worldEntities.add(new Ship({x: 50, y: 150}));
-			this.worldEntities.add(new Ship({x: 150, y:50, }));
+			this.worldEntities.add(new Ship({x: 150, y:150, ownedBy: 'player'}));
+			this.worldEntities.add(new Ship({x: 50, y: 150, ownedBy: 'player'}));
+			this.worldEntities.add(new Ship({x: 150, y:50, ownedBy: 'player'}));
 			
 			//planets acting as markers to edges and center
 			this.worldEntities.add(new Planet({x: 0, y: CONFIG.stage.height / 2}));

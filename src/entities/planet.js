@@ -4,24 +4,26 @@ define(function(require) {
 		Phaser = require('phaser'),
 		EntityBase = require('entity-base'),
 		ownableComponent = require('components/ownable'),
-		selectableComponent = require('components/selectable');
+		selectableComponent = require('components/selectable'),
+		shipGeneratorComponent = require('components/ship-generator');
 
 	function Planet(props) {
 		props.graphic = 'planet';
 		EntityBase.call(this, props);
 	}
 	
-	Planet.prototype = Object.create(Phaser.Sprite.prototype);
+	Planet.prototype = Object.create(EntityBase.prototype);
 	_.extend(
 		Planet.prototype,
 		ownableComponent,
-		selectableComponent, {
+		selectableComponent,
+		shipGeneratorComponent, {
 			constructor: Planet,
 			update: function() {
+				this.runComponentUpdates();
 			},
 		}
 	);
 	
-	window.Planet = Planet;
 	return Planet;
 });

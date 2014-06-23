@@ -30,6 +30,7 @@ define(function(require) {
 		{
 			constructor: Entity,
 			update: function() {
+				this.runComponentUpdates();
 			},
 			
 			runComponentUpdates: function() {
