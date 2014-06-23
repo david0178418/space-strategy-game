@@ -42,10 +42,6 @@ define(function(require) {
 			this.background1layer1 = game.add.tileSprite(CONFIG.screen.width * -0.25, CONFIG.screen.width * -0.25, CONFIG.screen.width * 1.25, CONFIG.screen.width * 1.25, 'background1-layer1');
 			this.background1layer2 = game.add.tileSprite(CONFIG.screen.width * -0.5, CONFIG.screen.width * -0.5, CONFIG.screen.width * 1.5, CONFIG.screen.width * 1.5, 'background1-layer2');
 			
-			/*this.background2layer1 = game.add.tileSprite(CONFIG.screen.width * -0.25, CONFIG.screen.width * -0.25, CONFIG.screen.width * 1.25, CONFIG.screen.width * 1.25, 'background2-layer1');
-			this.background2layer2 = game.add.tileSprite(CONFIG.screen.width * -0.5, CONFIG.screen.width * -0.5, CONFIG.screen.width * 1.5, CONFIG.screen.width * 1.5, 'background2-layer2');
-			this.background2layer3 = game.add.tileSprite(CONFIG.screen.width * -0.75, CONFIG.screen.width * -0.75, CONFIG.screen.width * 1.75, CONFIG.screen.width * 1.75, 'background2-layer3');*/
-			
 			game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
 			game.scale.setScreenSize();
 			window.worldEntities = this.worldEntities = instanceManager.get('worldEntities');
@@ -117,14 +113,6 @@ define(function(require) {
 			this.background1layer1.position.y = this.background1layer1.height * 0.005 * this.worldEntities.y / game.height;
 			this.background1layer2.position.x = this.background1layer2.width * 0.01 * this.worldEntities.x / game.width;
 			this.background1layer2.position.y = this.background1layer2.height * 0.01* this.worldEntities.y / game.height;
-			
-			
-			/*this.background2layer1.position.x = this.background2layer1.width * .001  * this.worldEntities.x / game.width;
-			this.background2layer1.position.y = this.background2layer1.height * .001 * this.worldEntities.y / game.height;
-			this.background2layer2.position.x = this.background2layer2.width * .01 * this.worldEntities.x / game.width;
-			this.background2layer2.position.y = this.background2layer2.height * .01* this.worldEntities.y / game.height;
-			this.background2layer3.position.x = this.background2layer3.width * .02 * this.worldEntities.x / game.width;
-			this.background2layer3.position.y = this.background2layer3.height * .02* this.worldEntities.y / game.height;*/
 		},
 
 		updateZoom: function() {
