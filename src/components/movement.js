@@ -57,6 +57,7 @@ define(function(require) {
 			pathGraphic.position.y = 0;
 			pathGraphic.moveTo(startingPoint.x, startingPoint.y);
 			pathGraphic.lineTo(x, y);
+			pathGraphic.drawCircle(x, y, 5);
 			pathGraphic.endFill();
 			
 			moveTween
@@ -67,6 +68,7 @@ define(function(require) {
 					pathGraphic.position.y = 0;
 					pathGraphic.moveTo(this.position.x, this.position.y);
 					pathGraphic.lineTo(x, y);
+					pathGraphic.drawCircle(x, y, 5);
 					pathGraphic.endFill();
 				}, this)
 				.onComplete.add(function() {

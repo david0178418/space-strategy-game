@@ -67,13 +67,6 @@ define(function(require) {
 
 			game.world.setBounds(0, 0, CONFIG.stage.width, CONFIG.stage.height);
 			
-			
-			
-			this.worldEntities.add(new Ship({x: 100, y: 100, ownedBy: 'player'}));
-			this.worldEntities.add(new Ship({x: 150, y:150, ownedBy: 'player'}));
-			this.worldEntities.add(new Ship({x: 50, y: 150, ownedBy: 'player'}));
-			this.worldEntities.add(new Ship({x: 150, y:50, ownedBy: 'player'}));
-			
 			//planets acting as markers to edges and center
 			this.worldEntities.add(new Planet({x: 0, y: CONFIG.stage.height / 2}));
 			this.worldEntities.add(new Planet({x: 0, y: 0}));
@@ -168,7 +161,7 @@ define(function(require) {
 		ship.context.setLineWidth(2);
 		ship.context.strokeStyle = "#eeeeee";
 		ship.context.lineTo(25, 0);
-		ship.context.lineTo(0, 0)
+		ship.context.lineTo(0, 0);
 		ship.context.lineTo(0, 30);
 		ship.context.lineTo(25, 30);
 		ship.context.lineTo(0, 30);
