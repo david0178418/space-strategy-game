@@ -80,18 +80,28 @@ define(function(require) {
 			this.controls = instanceManager.get('controls');
 		},
 		update: function(game) {
+			var dirtyBackground = false;
+			
 			// Vertial pan
 			if(this.controls.panUp.isDown) {
+				dirtyBackground = true;
 				this.worldEntities.y += this._panSpeed;
 			} else if(this.controls.panDown.isDown) {
+				dirtyBackground = true;
 				this.worldEntities.y -= this._panSpeed;
 			}
 
 			// Horizontal pa
 			if(this.controls.panRight.isDown) {
+				dirtyBackground = true;
 				this.worldEntities.x -= this._panSpeed;
 			} else if(this.controls.panLeft.isDown) {
+				dirtyBackground = true;
 				this.worldEntities.x += this._panSpeed;
+			}
+			
+			if(!dirtyBackground) {
+				return;
 			}
 			
 			// Limit view
