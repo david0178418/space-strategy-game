@@ -9,7 +9,7 @@ define(function(require) {
 			game = instanceManager.get('game');
 		Phaser.Sprite.call(this, game, props.x, props.y, props.graphic);
 		this.anchor.setTo(0.5, 0.5);
-		
+		this.autoCull = true;
 		this._componentUpdates = [];
 		
 		// Run any initilizations that may be attached and
@@ -22,6 +22,8 @@ define(function(require) {
 				this._componentUpdates.push(key);
 			}
 		}
+		
+		this.update = this.runComponentUpdates.bind(this);
 	}
 	
 	Entity.prototype = Object.create(Phaser.Sprite.prototype);
@@ -29,9 +31,7 @@ define(function(require) {
 		Entity.prototype,
 		{
 			constructor: Entity,
-			update: function() {
-				this.runComponentUpdates();
-			},
+			update: null,
 			
 			runComponentUpdates: function() {
 				for(var i = 0; i < this._componentUpdates.length; i++) {

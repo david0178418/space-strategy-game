@@ -12,13 +12,13 @@ define(function(require) {
 		
 		moveTo: function(x, y, queueMovement) {
 			var lastPath,
+				wayPointMarker = new Phaser.Sprite(this.game, x, y, 'waypointMarker'),
 				startingPoint = this.position,
 				endPoint = {
 					x: x,
 					y: y,
 				},
 				time = this.game.physics.arcade.distanceToXY(this, x, y) * 1000 / this.speed,
-				pathGraphic = this.game.add.graphics(0, 0, intanceManager.get('worldEntities')),
 				rotationTween = this.game.add.tween(this),
 				moveTween = this.game.add.tween(this.position).
 					to({
@@ -26,7 +26,8 @@ define(function(require) {
 						y:y,
 					}, time);
 			
-			pathGraphic.alpha = 0.5;
+			intanceManager.get('worldEntities').add(wayPointMarker);
+			
 			this._paths = this._paths || [];
 			
 			if(!queueMovement) {
@@ -43,37 +44,20 @@ define(function(require) {
 			this._paths.push({
 				start: startingPoint,
 				end: endPoint,
-				graphic: pathGraphic,
+				graphic: wayPointMarker,
 				move: moveTween,
 				rotation: rotationTween,
 			});
 			
 			rotationTween.to({
-				rotation: Phaser.Point.angle(endPoint, startingPoint),
+				rotation: Phaser.Point.angle(endPoint, startingPoint) - (Math.PI / 2),
 			}, 500);
 			
-			pathGraphic.lineStyle(this._lineThickness, 0x33ff33, 0.6);
-			pathGraphic.position.x = 0;
-			pathGraphic.position.y = 0;
-			pathGraphic.moveTo(startingPoint.x, startingPoint.y);
-			pathGraphic.lineTo(x, y);
-			pathGraphic.drawCircle(x, y, 5);
-			pathGraphic.endFill();
 			
 			moveTween
-				.onUpdateCallback(function() {
-					pathGraphic.clear();
-					pathGraphic.lineStyle(this._lineThickness, 0x33ff33, 0.6);
-					pathGraphic.position.x = 0;
-					pathGraphic.position.y = 0;
-					pathGraphic.moveTo(this.position.x, this.position.y);
-					pathGraphic.lineTo(x, y);
-					pathGraphic.drawCircle(x, y, 5);
-					pathGraphic.endFill();
-				}, this)
 				.onComplete.add(function() {
 					this._paths = _.filter(this._paths, function(path) {
-						if(path.graphic === pathGraphic) {
+						if(path.graphic === wayPointMarker) {
 							this._killPath(path);
 							return false;
 						} else {

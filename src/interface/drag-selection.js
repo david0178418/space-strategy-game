@@ -18,6 +18,7 @@ define(function(require) {
 		this.startSelection = false;
 		this.mousePointer = game.input.mousePointer;
 		this.controls = instanceManager.get('controls');
+		this.selectedEntities = null;
 		game.add.existing(this);
 		
 		this.x = this.y = -500;
@@ -104,10 +105,16 @@ define(function(require) {
 				entity,
 				avgX,
 				avgY,
+				maxX = this.game.world.height * 10,
+				maxY = this.game.world.width * 10,
+				minX = -1,
+				minY = -1,
 				xDiff,
 				yDiff,
 				xTotal = 0,
 				yTotal = 0,
+				rowCount,
+				slotWidth = 80,
 				movableSelectedCount = 0,
 				selectedEntities = [];
 
@@ -121,22 +128,41 @@ define(function(require) {
 						movableSelectedCount++;
 						xTotal += entity.x;
 						yTotal += entity.y;
+						
+						if(entity.x > maxX) {
+							maxX = entity.x;
+						} else if(entity.x < minX) {
+							minX = entity.x;
+						}
+						
+						if(entity.y > maxY) {
+							maxY = entity.y;
+						} else if(entity.y < minY) {
+							minY = entity.y;
+						}
 					}
 				}
 			}
+			
+			//TOD Remove debug
+			window.selectedEntities = selectedEntities;
+			
+			rowCount = Math.sqrt(movableSelectedCount) | 0;
 
 			avgX = xTotal / movableSelectedCount;
 			avgY = yTotal / movableSelectedCount;
-
+			
 			for(i = 0; i < selectedEntities.length; i++) {
 				entity = selectedEntities[i];
-				xDiff = avgX - entity.x;
-				yDiff = avgY - entity.y;
-				entity.rightClickHandler(x - xDiff, y - yDiff, this.controls.shiftModifier.isDown);
+				
+				xDiff = slotWidth * (i % rowCount);
+				yDiff = slotWidth * ((i / rowCount)| 0);
+				entity.rightClickHandler(x + xDiff, y + yDiff, this.controls.shiftModifier.isDown);
 			}
 		},
 	});
 
+	//TOD Remove debug
 	window.DragSelection = DragSelection;
 	return DragSelection;
 });

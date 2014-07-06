@@ -9,12 +9,10 @@ define(function(require) {
 		isSelected: false,
 
 		initComponentSelectable: function() {
-			this._selectionGraphic = new Phaser.Graphics(this.game, 0, 0);
-			this._selectionGraphic
-				.lineStyle(5, 0xff3333, 0.6)
-				.moveTo(0, 0)
-				.drawCircle(0, 0, (this.width/2) + this._radiusBuffer)
-				.endFill();
+			this._selectionGraphic = new Phaser.Sprite(this.game, 0, 0, 'selection');
+			
+			this._selectionGraphic.anchor.setTo(0.5, 0.5);
+			
 
 			this._selectionGraphic.visible = false;
 			

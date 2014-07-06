@@ -26,16 +26,18 @@ define(function(require) {
 			Hud.preload(game);
 			Beam.preload(game);
 			
+			game.load.atlas('ships', 'assets/images/ships-spritesheet.png', 'assets/images/ships-atlas.json');
+			game.load.atlas('planets', 'assets/images/planets-spritesheet.png', 'assets/images/planets-atlas.json');
+
+			game.load.image('selection', '/assets/images/selection.png', 50, 50);
+			game.load.image('waypointMarker', '/assets/images/waypoint.png', 20, 20);
+			
 			game.load.image('background1-layer1', '/assets/images/backdrop-black-little-spark-black.png', 512, 512);
 			game.load.image('background1-layer2', '/assets/images/backdrop-black-little-spark-transparent.png', 512, 512);
 			
-			game.load.image('background2-layer1', '/assets/images/parallax100.png', 500, 500);
-			game.load.image('background2-layer2', '/assets/images/parallax80.png', 500, 500);
-			game.load.image('background2-layer3', '/assets/images/parallax60.png', 500, 500);
-			
 			// Temp render functions
-			game.load.spritesheet('planet', renderPlanet(game), 100, 100);
-			game.load.spritesheet('ship', renderShip(game), 40, 30);
+			game.load.image('planet', renderPlanet(game), 100, 100);
+			game.load.image('ship', renderShip(game), 40, 30);
 		},
 		
 		create: function(game) {
@@ -58,6 +60,9 @@ define(function(require) {
 				} else {
 					this._zoomTarget = e.wheelDelta > 0 ? this._zoomMax : this._zoomMin;
 				}
+				
+				this.limitView();
+				this.updateBackground();
 
 			}, this));
 
@@ -104,6 +109,12 @@ define(function(require) {
 				return;
 			}
 			
+			this.limitView();
+			
+			this.updateBackground();
+		},
+		
+		limitView: function() {
 			// Limit view
 			// Run check each tick to account for
 			// other position mutators such as zooming
@@ -118,11 +129,13 @@ define(function(require) {
 			} else if(this.worldEntities.x > 0) {
 				this.worldEntities.x = 0;
 			}
-			
-			this.background1layer1.position.x = this.background1layer1.width * 0.005  * this.worldEntities.x / game.width;
-			this.background1layer1.position.y = this.background1layer1.height * 0.005 * this.worldEntities.y / game.height;
-			this.background1layer2.position.x = this.background1layer2.width * 0.01 * this.worldEntities.x / game.width;
-			this.background1layer2.position.y = this.background1layer2.height * 0.01* this.worldEntities.y / game.height;
+		},
+		
+		updateBackground: function() {
+			this.background1layer1.position.x = this.background1layer1.width * 0.005  * this.worldEntities.x / this.game.width;
+			this.background1layer1.position.y = this.background1layer1.height * 0.005 * this.worldEntities.y / this.game.height;
+			this.background1layer2.position.x = this.background1layer2.width * 0.01 * this.worldEntities.x / this.game.width;
+			this.background1layer2.position.y = this.background1layer2.height * 0.01* this.worldEntities.y / this.game.height;
 		},
 
 		updateZoom: function() {
@@ -153,10 +166,10 @@ define(function(require) {
 	
 	//Dummy graphics rendering functions
 	function renderShip(game) {
-		var ship = game.add.bitmapData(40, 30, 'ship', true);
+		var ship = game.add.bitmapData(40, 30);
 		
 		ship.context.beginPath();
-		ship.context.setLineWidth(2);
+		ship.context.lineWidth = 2;
 		ship.context.strokeStyle = "#eeeeee";
 		ship.context.lineTo(25, 0);
 		ship.context.lineTo(0, 0);
@@ -179,11 +192,11 @@ define(function(require) {
 		return ship.canvas.toDataURL();
 	}
 	
-	function renderPlanet() {
-		var planet = game.add.bitmapData(100, 100, 'ship', true);
+	function renderPlanet(game) {
+		var planet = game.add.bitmapData(100, 100);
 		
 		planet.context.beginPath();
-		planet.context.setLineWidth(5);
+		planet.context.lineWidth = 5;
 		planet.context.strokeStyle = "#0093ff";
 		planet.context.fillStyle = "#0ffda7";
 		planet.context.arc(50, 50, 45, 0, 2 * Math.PI);

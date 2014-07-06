@@ -10,9 +10,10 @@ define(function(require) {
 		selectableComponent = require('components/selectable');
 	
 	function Ship(props) {
-		props.graphic = 'ship';
+		props.graphic = 'ships';
 		EntityBase.call(this, props);
 		this.speed = 100;
+		this.frame = _.random(1, 75);
 	}
 	
 	Ship.preload = function() {};
@@ -27,6 +28,7 @@ define(function(require) {
 			selectableComponent, {
 				constructor: Ship,
 				update: function() {
+					this.runComponentUpdates();
 				},
 				rightClickHandler: function(x, y, shiftIsDown) {
 					this.moveTo(x, y, shiftIsDown);

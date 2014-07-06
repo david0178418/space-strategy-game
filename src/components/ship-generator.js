@@ -10,7 +10,7 @@ define(function(require) {
 		waypoint: null,
 		
 		initComponentShipGenerate: function() {
-			worldEntities = instanceManager.get('worldEntities')
+			worldEntities = instanceManager.get('worldEntities');
 			this.waypoint = {
 				x: this.x,
 				y: this.y,
