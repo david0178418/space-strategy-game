@@ -6,7 +6,6 @@ define(function(require) {
 		States = require('states'),
 		Planet = require('entities/planet'),
 		Beam = require('entities/beam'),
-		Ship = require('entities/ship'),
 		Hud = require('interface/hud'),
 		DragSelection = require('interface/drag-selection'),
 		instanceManager = require('instance-manager'),
@@ -28,16 +27,15 @@ define(function(require) {
 			
 			game.load.atlas('ships', 'assets/images/ships-spritesheet.png', 'assets/images/ships-atlas.json');
 			game.load.atlas('planets', 'assets/images/planets-spritesheet.png', 'assets/images/planets-atlas.json');
+			
+			game.load.image('ship', 'assets/images/ship.png');
+			game.load.image('planet', 'assets/images/planet.png');
 
 			game.load.image('selection', '/assets/images/selection.png', 50, 50);
 			game.load.image('waypointMarker', '/assets/images/waypoint.png', 20, 20);
 			
 			game.load.image('background1-layer1', '/assets/images/backdrop-black-little-spark-black.png', 512, 512);
 			game.load.image('background1-layer2', '/assets/images/backdrop-black-little-spark-transparent.png', 512, 512);
-			
-			// Temp render functions
-			game.load.image('planet', renderPlanet(game), 100, 100);
-			game.load.image('ship', renderShip(game), 40, 30);
 		},
 		
 		create: function(game) {
@@ -112,6 +110,7 @@ define(function(require) {
 			this.limitView();
 			
 			this.updateBackground();
+			this.updateZoom();
 		},
 		
 		limitView: function() {
@@ -162,47 +161,5 @@ define(function(require) {
 				y: _.random(100, CONFIG.stage.height - 100),
 			}));
 		}
-	}
-	
-	//Dummy graphics rendering functions
-	function renderShip(game) {
-		var ship = game.add.bitmapData(40, 30);
-		
-		ship.context.beginPath();
-		ship.context.lineWidth = 2;
-		ship.context.strokeStyle = "#eeeeee";
-		ship.context.lineTo(25, 0);
-		ship.context.lineTo(0, 0);
-		ship.context.lineTo(0, 30);
-		ship.context.lineTo(25, 30);
-		ship.context.lineTo(0, 30);
-		ship.context.lineTo(40, 15);
-		ship.context.lineTo(0, 0);
-		ship.context.stroke();
-		
-		ship.context.beginPath();
-		ship.context.fillStyle = "#444444";
-		ship.context.lineTo(40, 15);
-		ship.context.lineTo(0, 30);
-		ship.context.lineTo(0, 0);
-		ship.context.lineTo(40, 15);
-		
-		ship.context.fill();
-		
-		return ship.canvas.toDataURL();
-	}
-	
-	function renderPlanet(game) {
-		var planet = game.add.bitmapData(100, 100);
-		
-		planet.context.beginPath();
-		planet.context.lineWidth = 5;
-		planet.context.strokeStyle = "#0093ff";
-		planet.context.fillStyle = "#0ffda7";
-		planet.context.arc(50, 50, 45, 0, 2 * Math.PI);
-		planet.context.stroke();
-		planet.context.fill();
-		
-		return planet.canvas.toDataURL();
 	}
 });

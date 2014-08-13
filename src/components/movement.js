@@ -26,6 +26,8 @@ define(function(require) {
 						y:y,
 					}, time);
 			
+			wayPointMarker.anchor.setTo(0.5, 0.5);
+			
 			intanceManager.get('worldEntities').add(wayPointMarker);
 			
 			this._paths = this._paths || [];
@@ -50,7 +52,7 @@ define(function(require) {
 			});
 			
 			rotationTween.to({
-				rotation: Phaser.Point.angle(endPoint, startingPoint) - (Math.PI / 2),
+				rotation: Phaser.Point.angle(endPoint, startingPoint),
 			}, 500);
 			
 			

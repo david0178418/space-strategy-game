@@ -7,9 +7,8 @@ define(function(require) {
 		shipGeneratorComponent = require('components/ship-generator');
 
 	function Planet(props) {
-		props.graphic = 'planets';
+		props.graphic = 'planet';
 		EntityBase.call(this, props);
-		this.frame = _.random(1, 70);
 	}
 	
 	Planet.prototype = Object.create(EntityBase.prototype);

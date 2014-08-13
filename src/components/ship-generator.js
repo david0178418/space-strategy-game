@@ -1,8 +1,8 @@
 define(function(require) {
 	"use strict";
-	var worldEntities,
-		Ship = require('entities/ship'),
-		instanceManager = require('instance-manager');
+	var worldEntities;
+	var Fighter = require('entities/ships/fighter');
+	var instanceManager = require('instance-manager');
 	
 	return {
 		activeGenerator: null,
@@ -17,8 +17,8 @@ define(function(require) {
 			};
 			this.generators = [
 				{
-					type: Ship,
-					buildTime: 2000,
+					type: Fighter,
+					buildTime: 6000,
 					currentUnitBuildTime: 0,
 				}
 			];
