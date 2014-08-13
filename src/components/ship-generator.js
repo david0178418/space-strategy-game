@@ -7,11 +7,11 @@ define(function(require) {
 	return {
 		activeGenerator: null,
 		shipTypes: null,
-		waypoint: null,
+		rallyPoint: null,
 		
 		initComponentShipGenerate: function() {
 			worldEntities = instanceManager.get('worldEntities');
-			this.waypoint = {
+			this.rallyPoint = {
 				x: this.x,
 				y: this.y,
 			};
