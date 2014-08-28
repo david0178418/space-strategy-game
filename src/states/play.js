@@ -1,15 +1,15 @@
 define(function(require) {
-	"use strict";
-	var CONFIG = require('config'),
-		_ = require('lodash'),
-		Phaser = require('phaser'),
-		States = require('states'),
-		Planet = require('entities/planet'),
-		Beam = require('entities/beam'),
-		Hud = require('interface/hud'),
-		DragSelection = require('interface/drag-selection'),
-		instanceManager = require('instance-manager'),
-		game = instanceManager.get('game');
+	'use strict';
+	var CONFIG = require('config');
+	var _ = require('lodash');
+	var Phaser = require('phaser');
+	var States = require('states');
+	var Planet = require('entities/planet');
+	var Beam = require('entities/beam');
+	var Hud = require('interface/hud');
+	var DragSelection = require('interface/drag-selection');
+	var instanceManager = require('instance-manager');
+	var game = instanceManager.get('game');
 
 	States.Play = 'play';
 	game.state.add(States.Play, {

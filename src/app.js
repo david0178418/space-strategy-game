@@ -1,9 +1,9 @@
 define(function(require) {
-	"use strict";
-	var _ = require('lodash'),
-		States = require('states'),
-		instanceManager = require('instance-manager'),
-		game = instanceManager.get('game');
+	'use strict';
+	var _ = require('lodash');
+	var States = require('states');
+	var instanceManager = require('instance-manager');
+	var game = instanceManager.get('game');
 	
 	require('states/play');
 

@@ -1,8 +1,8 @@
-//Really, "Service Locatore"...but whatever...  Using the
+//Really, "Service Locator"...but whatever...  Using the
 //anti-pattern just to get this thing up.
 //TODO Organize more neatly so dependecies are known by the interface
 define(function(require, exports) {
-	"use strict";
+	'use strict';
 	
 	//TODO remove debug global
 	var instanceManager = window.instanceManager = exports;
@@ -14,7 +14,8 @@ define(function(require, exports) {
 					Phaser = require('phaser');
 
 				//TODO remove debug global
-				return window.game = new Phaser.Game(CONFIG.screen.width, CONFIG.screen.height, Phaser.AUTO, 'phaser');
+				window.game = new Phaser.Game(CONFIG.screen.width, CONFIG.screen.height, Phaser.AUTO, 'phaser');
+				return window.game;
 			},
 		},
 		

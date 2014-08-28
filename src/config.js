@@ -1,5 +1,5 @@
 define(function() {
-	"use strict";
+	'use strict';
 	return {
 		screen: {
 			width: 1280,

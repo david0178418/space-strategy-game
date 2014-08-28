@@ -1,5 +1,5 @@
-define(function(require) {
-	"use strict";
+define(function() {
+	'use strict';
 	return {
 		_targetAction: function(){},
 		_range: 10000,

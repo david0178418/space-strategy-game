@@ -1,6 +1,5 @@
 define(function(require) {
-	"use strict";
-	
+	'use strict';
 	return {
 		_coolDown:1000,
 		_lastFire: 0,

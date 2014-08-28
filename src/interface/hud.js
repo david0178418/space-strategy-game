@@ -1,9 +1,9 @@
 define(function(require) {
-	"use strict";
+	'use strict';
 	//TODO Need better place to organize since not really an entity.  Maybe "interface" folder?
-	var _ = require('lodash'),
-		Phaser = require('phaser'),
-		instanceManager = require('instance-manager');
+	var _ = require('lodash');
+	var Phaser = require('phaser');
+	var instanceManager = require('instance-manager');
 
 	function Hud() {
 		this.game = instanceManager.get('game');

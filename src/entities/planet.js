@@ -1,10 +1,10 @@
 define(function(require) {
-	"use strict";
-	var _ = require('lodash'),
-		EntityBase = require('entity-base'),
-		ownableComponent = require('components/ownable'),
-		selectableComponent = require('components/selectable'),
-		shipGeneratorComponent = require('components/ship-generator');
+	'use strict';
+	var _ = require('lodash')
+	var EntityBase = require('entity-base');
+	var ownableComponent = require('components/ownable');
+	var selectableComponent = require('components/selectable');
+	var shipGeneratorComponent = require('components/ship-generator');
 
 	function Planet(props) {
 		props.graphic = 'planet';

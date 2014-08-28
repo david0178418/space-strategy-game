@@ -1,5 +1,5 @@
 define(function(require) {
-	"use strict";
+	'use strict';
 	var Beam = require('entities/beam');
 	
 	return {

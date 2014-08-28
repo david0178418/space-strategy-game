@@ -1,8 +1,8 @@
 define(function(require) {
-	"use strict";
-	var _ = require('lodash'),
-		Phaser = require('phaser'),
-		instanceManager = require('instance-manager');
+	'use strict';
+	var _ = require('lodash');
+	var Phaser = require('phaser');
+	var instanceManager = require('instance-manager');
 
 	function DragSelection() {
 		var game = instanceManager.get('game');

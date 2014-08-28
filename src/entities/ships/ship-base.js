@@ -1,11 +1,11 @@
 define(function(require) {
-	"use strict";
-	var _ = require('lodash'),
-		EntityBase = require('entity-base'),
-		damageComponent = require('components/damage'),
-		movementComponent = require('components/movement'),
-		ownableComponent = require('components/ownable'),
-		selectableComponent = require('components/selectable');
+	'use strict';
+	var _ = require('lodash');
+	var EntityBase = require('entity-base');
+	var damageComponent = require('components/damage');
+	var movementComponent = require('components/movement');
+	var ownableComponent = require('components/ownable');
+	var selectableComponent = require('components/selectable');
 	
 	function ShipBase(props) {
 		props.graphic = 'ship';

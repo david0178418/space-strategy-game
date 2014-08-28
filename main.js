@@ -14,7 +14,7 @@ requirejs.config({
 
 require(['app'],
 	function(App) {
-		"use strict";
-		var app = new App('#app');
+		'use strict';
+		new App('#app');
 	}
 );

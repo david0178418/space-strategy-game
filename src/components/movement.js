@@ -1,8 +1,8 @@
 define(function(require) {
-	"use strict";
-	var _ = require('lodash'),
-		Phaser = require('phaser'),
-		intanceManager = require('instance-manager');
+	'use strict';
+	var _ = require('lodash');
+	var Phaser = require('phaser');
+	var intanceManager = require('instance-manager');
 
 	return {
 		_paths: null,

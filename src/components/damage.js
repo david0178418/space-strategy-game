@@ -1,6 +1,5 @@
-define(function(require) {
-	"use strict";
-	
+define(function() {
+	'use strict';
 	return {
 		sounds: {},
 
