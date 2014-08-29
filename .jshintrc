@@ -3,12 +3,10 @@
     "browser"       : true,
     "globals"        : {  // Extra globals.
         "require": false,
-		"requirejs": false,
-        "define": false
-	},
+        "module": false
+    },
     "debug"         : false,
     "devel"         : true,
-    "strict"        : true,
     "globalstrict"  : false,
     "asi"           : false,
     "laxbreak"      : false,

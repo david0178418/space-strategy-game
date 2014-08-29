@@ -1,0 +1,27 @@
+{
+  "name": "Space-Strategy-Game",
+  "version": "0.0.1",
+  "description": "Current Library versions:",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@davidgranado.com:6003/~/space-strategy-game.git"
+  },
+  "author": "David Granado",
+  "license": "ISC",
+  "devDependencies": {
+    "browserify": "^5.11.0",
+    "exorcist": "^0.1.6",
+    "gulp": "^3.8.7",
+    "gulp-webserver": "^0.6.0",
+    "vinyl-source-stream": "^0.1.1"
+  },
+  "dependencies": {
+    "phaser": "git://github.com/photonstorm/phaser.git#v2.0.6",
+    "lodash": "^2.4.1"
+  }
+}

@@ -1,4 +1,1 @@
-define(function() {
-	'use strict';
-	return {};
-});
+module.exports = {};
