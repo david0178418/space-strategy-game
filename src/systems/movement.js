@@ -2,9 +2,10 @@ var _ = require('lodash');
 var Phaser = require('phaser');
 var intanceManager = require('instance-manager');
 
+require('ecs/ecs').registerSystem();
+
 module.exports = {
 	_paths: null,
-	_lineThickness: 3,
 	moving: false,
 	movable: true,
 	

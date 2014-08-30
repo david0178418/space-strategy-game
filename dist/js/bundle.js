@@ -3,7 +3,129 @@
 var App = require('app');
 new App('#app');
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/main.js","/")
-},{"_process":5,"app":7,"buffer":2}],2:[function(require,module,exports){
+},{"_process":7,"app":12,"buffer":4}],2:[function(require,module,exports){
+(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
+var _ = require('lodash');
+var EntityBase = require('./entity-base');
+
+module.exports = {
+	_entities: [],
+	_initSystems: {},
+	_runSystems: {},
+	_components: {},
+	createEntity: function(props) {
+		var entity = new EntityBase(props);
+		this._entities.push(entity);
+		return entity;
+	},
+
+	// @param {string} name - component name.  If component with matching name doesn't
+	//		exist, a new one will be created using the provided properties as defaults
+	// @param {object} [props={}] - component instant overrides.
+	// @return {object}
+	createComponent: function(name, props) {
+		var component = this._components[name];
+		props = props || {};
+		if(!component) {
+			this.registerComponent(name, props);
+			return props;
+		}
+
+		return _.extend(props, component);
+	},
+
+	destroyEntity: function(entity) {
+		var entityId = _.isObject(entity) ? entity.get('id') : entityId;
+		delete this._entities[entityId];
+		entity.destroy();
+		return this;
+	},
+
+	getEntities: function(components) {
+		return _.select(this._entities, function(entity) {
+			return !(_.difference(components, entity.getComponents()).length);
+		});
+	},
+
+	// @param {string} name
+	// @param {object} [defaultData={}] - provide an optional baseline for a component
+	registerComponent: function(name, defaultData) {
+		this._components[name] = defaultData;
+	},
+
+	// @param {string} name
+	// @param {object} system
+	// @param {array} system.components - listing of components required for system operation
+	// @param {function} system.run - system tick logic.  Receives array of all matching entities.
+	// @param {function} system.init - system initialization.
+	registerSystem: function(name, system) {
+		if(system.init) {
+			this._initSystems[name] = system;
+		}
+
+		if(system.run) {
+			this._runSystems[name] = system;
+		}
+	},
+
+	runSystemInits: function() {
+		_.each(this._initSystems, function(system) {
+			system.init();
+		});
+	},
+	runSystems: function() {
+		_.each(this._runSystems, function(system) {
+			system.run();
+		});
+	}
+};
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/libs/ecs/ecs.js","/libs/ecs")
+},{"./entity-base":3,"_process":7,"buffer":4,"lodash":8}],3:[function(require,module,exports){
+(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
+var _ = require('lodash');
+var ecs = require('./ecs');
+var instanceManager = require('instance-manager');
+var Phaser = require('phaser');
+
+function Entity(props) {
+	this.id = _.uniqueId('entity-');
+	this._components = {};
+
+	var game = instanceManager.get('game');
+	
+	Phaser.Sprite.call(this, game, props.x, props.y, props.graphic);
+	this.anchor.setTo(0.5, 0.5);
+	this.autoCull = true;
+}
+
+Entity.prototype = Object.create(Phaser.Sprite.prototype);
+_.extend(Entity.prototype, {
+	constructor: Entity,
+	id: null,
+	_components: null,
+	addComponent: function(component, props) {
+		this._components[component] = ecs.createComponent(component, props);
+
+		return this;
+	},
+	currentComponents: function() {
+		//TODO Cache this
+		return _.keys(this._components);
+	},
+	getComponent: function(component) {
+		return this._components[component];
+	},
+	hasComponent: function(component) {
+		return _.contains(this.currentComponents(), component);
+	},
+	hasComponents: function(components) {
+		_.all(components, this.hasComponent, this);
+	},
+});
+
+module.exports = Entity;
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/libs/ecs/entity-base.js","/libs/ecs")
+},{"./ecs":2,"_process":7,"buffer":4,"instance-manager":16,"lodash":8,"phaser":11}],4:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /*!
  * The buffer module from node.js, for the browser.
@@ -1176,7 +1298,7 @@ function assert (test, message) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/node_modules/browserify/node_modules/buffer/index.js","/node_modules/browserify/node_modules/buffer")
-},{"_process":5,"base64-js":3,"buffer":2,"ieee754":4}],3:[function(require,module,exports){
+},{"_process":7,"base64-js":5,"buffer":4,"ieee754":6}],5:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
@@ -1300,7 +1422,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/node_modules/browserify/node_modules/buffer/node_modules/base64-js/lib/b64.js","/node_modules/browserify/node_modules/buffer/node_modules/base64-js/lib")
-},{"_process":5,"buffer":2}],4:[function(require,module,exports){
+},{"_process":7,"buffer":4}],6:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 exports.read = function(buffer, offset, isLE, mLen, nBytes) {
   var e, m,
@@ -1388,7 +1510,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
 };
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/node_modules/browserify/node_modules/buffer/node_modules/ieee754/index.js","/node_modules/browserify/node_modules/buffer/node_modules/ieee754")
-},{"_process":5,"buffer":2}],5:[function(require,module,exports){
+},{"_process":7,"buffer":4}],7:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 // shim for using process in browser
 
@@ -1455,7 +1577,7 @@ process.chdir = function (dir) {
 };
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/node_modules/browserify/node_modules/process/browser.js","/node_modules/browserify/node_modules/process")
-},{"_process":5,"buffer":2}],6:[function(require,module,exports){
+},{"_process":7,"buffer":4}],8:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /**
  * @license
@@ -8244,7 +8366,118 @@ process.chdir = function (dir) {
 }.call(this));
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/node_modules/lodash/dist/lodash.js","/node_modules/lodash/dist")
-},{"_process":5,"buffer":2}],7:[function(require,module,exports){
+},{"_process":7,"buffer":4}],9:[function(require,module,exports){
+(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
+var _ = require('lodash');
+
+require('ecs/ecs').registerSystem('camera', {
+	zoomMax: 300,
+	zoomMin: 15,
+	panSpeed: 8,
+	zoomTween: null,
+	zoomTarget: 100,	//%
+	zoomIncrement: 5,	//%
+	init: function() {
+		var CONFIG = require('config');
+		var instanceManager = require('instance-manager');
+		this.worldEntities = instanceManager.get('worldEntities');
+		this.game = instanceManager.get('game');
+		this.controls = instanceManager.get('controls');
+		this.world = this.game.world;
+		this.background1layer1 = this.game.add.tileSprite(CONFIG.screen.width * -0.25, CONFIG.screen.width * -0.25, CONFIG.screen.width * 1.25, CONFIG.screen.width * 1.25, 'background1-layer1');
+		this.background1layer2 = this.game.add.tileSprite(CONFIG.screen.width * -0.5, CONFIG.screen.width * -0.5, CONFIG.screen.width * 1.5, CONFIG.screen.width * 1.5, 'background1-layer2');
+
+		window.addEventListener('mousewheel', _.bind(function(e) {
+			if(this.game.paused) {
+				return;
+			}
+
+			this.zoomTarget += this.zoomIncrement * (e.wheelDelta > 0 ? 1 : -1);
+
+			if(this.zoomTarget >= this.zoomMin && this.zoomTarget <= this.zoomMax) {
+				this.updateZoom();
+			} else {
+				this.zoomTarget = e.wheelDelta > 0 ? this.zoomMax : this.zoomMin;
+			}
+			
+			this.limitView();
+			this.updateBackground();
+
+		}, this));
+	},
+
+	run: function() {
+		var dirtyBackground = false;
+		
+		// Vertial pan
+		if(this.controls.panUp.isDown) {
+			dirtyBackground = true;
+			this.worldEntities.y += this.panSpeed;
+		} else if(this.controls.panDown.isDown) {
+			dirtyBackground = true;
+			this.worldEntities.y -= this.panSpeed;
+		}
+
+		// Horizontal pa
+		if(this.controls.panRight.isDown) {
+			dirtyBackground = true;
+			this.worldEntities.x -= this.panSpeed;
+		} else if(this.controls.panLeft.isDown) {
+			dirtyBackground = true;
+			this.worldEntities.x += this.panSpeed;
+		}
+		
+		if(!dirtyBackground) {
+			return;
+		}
+		
+		this.limitView();
+		
+		this.updateBackground();
+		this.updateZoom();
+	},
+	limitView: function() {
+		// Limit view
+		// Run check each tick to account for
+		// other position mutators such as zooming
+		if(this.worldEntities.y > 0) {
+			this.worldEntities.y = 0;
+		} else if(this.worldEntities.y < -(this.world.height * this.worldEntities.scale.y - this.game.camera.height)) {
+			this.worldEntities.y = -(this.world.height * this.worldEntities.scale.y - this.game.camera.height);
+		}
+		
+		if(this.worldEntities.x < -(this.world.width * this.worldEntities.scale.x - this.game.camera.width)) {
+			this.worldEntities.x = -(this.world.width * this.worldEntities.scale.x - this.game.camera.width);
+		} else if(this.worldEntities.x > 0) {
+			this.worldEntities.x = 0;
+		}
+	},
+	
+	updateBackground: function() {
+		this.background1layer1.position.x = this.background1layer1.width * 0.005  * this.worldEntities.x / this.game.width;
+		this.background1layer1.position.y = this.background1layer1.height * 0.005 * this.worldEntities.y / this.game.height;
+		this.background1layer2.position.x = this.background1layer2.width * 0.01 * this.worldEntities.x / this.game.width;
+		this.background1layer2.position.y = this.background1layer2.height * 0.01* this.worldEntities.y / this.game.height;
+	},
+
+	updateZoom: function() {
+		var zoom = this.zoomTarget / 100,
+			localPosition = this.game.input.getLocalPosition(this.worldEntities, this.game.input.mousePointer);
+
+		this.worldEntities.position.x += localPosition.x * (this.worldEntities.scale.x - zoom);
+		this.worldEntities.position.y += localPosition.y * (this.worldEntities.scale.y - zoom);
+		this.worldEntities.scale.setTo(zoom);
+	},
+});
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/camera.js","/src/systems")
+},{"_process":7,"buffer":4,"config":13,"ecs/ecs":10,"instance-manager":16,"lodash":8}],10:[function(require,module,exports){
+module.exports=require(2)
+},{"./entity-base":3,"/home/davidg/Projects/JsGames/space-strategy-game/libs/ecs/ecs.js":2,"_process":7,"buffer":4,"lodash":8}],11:[function(require,module,exports){
+(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
+//TODO get rid of this hack
+module.exports = window.Phaser;
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/libs/phaser.js","/libs")
+},{"_process":7,"buffer":4}],12:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var _ = require('lodash');
 var States = require('states');
@@ -8262,225 +8495,7 @@ module.exports = function() {
 	});
 };
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/app.js","/src")
-},{"_process":5,"buffer":2,"instance-manager":19,"lodash":6,"states":23,"states/play":24}],8:[function(require,module,exports){
-(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
-module.exports = {
-	sounds: {},
-
-	isDead: function() {
-		return this.health <= 0;
-	},
-
-	damage: function(points) {
-		this.health -= points;
-		if(this.health < 0) {
-			this.health = 0;
-		}
-
-		if(this.sounds.damage) {
-			this.sounds.damage.play();
-		}
-
-		return this.health;
-	},
-};
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/components/damage.js","/src/components")
-},{"_process":5,"buffer":2}],9:[function(require,module,exports){
-(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
-var _ = require('lodash');
-var Phaser = require('phaser');
-var intanceManager = require('instance-manager');
-
-module.exports = {
-	_paths: null,
-	_lineThickness: 3,
-	moving: false,
-	movable: true,
-	
-	moveTo: function(x, y, queueMovement) {
-		var lastPath,
-			wayPointMarker = new Phaser.Sprite(this.game, x, y, 'waypointMarker'),
-			startingPoint = this.position,
-			endPoint = {
-				x: x,
-				y: y,
-			},
-			time = this.game.physics.arcade.distanceToXY(this, x, y) * 1000 / this.speed,
-			rotationTween = this.game.add.tween(this),
-			moveTween = this.game.add.tween(this.position).
-				to({
-					x:x,
-					y:y,
-				}, time);
-		
-		wayPointMarker.anchor.setTo(0.5, 0.5);
-		
-		intanceManager.get('worldEntities').add(wayPointMarker);
-		
-		this._paths = this._paths || [];
-		
-		if(!queueMovement) {
-			_.each(this._paths, function(path) {
-				this._killPath(path);
-			}, this);
-			
-			this._paths = [];
-		} else if(this._paths.length) {
-			lastPath = _.last(this._paths);
-			startingPoint = lastPath.end;
-		}
-		
-		this._paths.push({
-			start: startingPoint,
-			end: endPoint,
-			graphic: wayPointMarker,
-			move: moveTween,
-			rotation: rotationTween,
-		});
-		
-		rotationTween.to({
-			rotation: Phaser.Point.angle(endPoint, startingPoint),
-		}, 500);
-		
-		
-		moveTween
-			.onComplete.add(function() {
-				this._paths = _.filter(this._paths, function(path) {
-					if(path.graphic === wayPointMarker) {
-						this._killPath(path);
-						return false;
-					} else {
-						return true;
-					}
-					
-				}, this);
-			}, this);
-		
-		if(queueMovement && lastPath) {
-			lastPath.move.onComplete.add(function() {
-				moveTween.start();
-				rotationTween.start();	
-			});
-		} else {
-			moveTween.start();
-			rotationTween.start();
-		}
-	},
-	
-	_killPath: function(path) {
-		path.graphic.destroy();
-		path.move.stop();
-		path.rotation.stop();
-	}
-};
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/components/movement.js","/src/components")
-},{"_process":5,"buffer":2,"instance-manager":19,"lodash":6,"phaser":22}],10:[function(require,module,exports){
-(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
-module.exports = {
-	ownedBy: 'neutral',
-	ownable: true,
-	
-	initComponentOwnable: function(props) {
-		this.ownedBy = props.ownedBy || this.ownedBy;
-	},
-	
-	isOwnedBy: function(team) {
-		return team === this.ownedBy;
-	},
-};
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/components/ownable.js","/src/components")
-},{"_process":5,"buffer":2}],11:[function(require,module,exports){
-(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
-var Phaser = require('phaser');
-
-module.exports =  {
-	_selectionGraphic: null,
-	_radiusBuffer: 20,
-	isSelectable: true,
-	isSelected: false,
-
-	initComponentSelectable: function() {
-		this._selectionGraphic = new Phaser.Sprite(this.game, 0, 0, 'selection');
-		
-		this._selectionGraphic.anchor.setTo(0.5, 0.5);
-		
-
-		this._selectionGraphic.visible = false;
-		
-		//TODO Change to a child once real sprites are used
-		// due to scaling wierdness
-		this.addChild(this._selectionGraphic);
-	},
-
-	toggleSelection: function() {
-		if(this.isSelected) {
-			this.unselect();
-		} else {
-			this.select();
-		}
-	},
-
-	select: function() {
-		this.isSelected = true;
-		this._selectionGraphic.visible = true;
-	},
-
-	deselect: function() {
-		this.isSelected = false;
-		this._selectionGraphic.visible = false;
-	},
-	
-	rightClickHandler: function() {
-	},
-};
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/components/selectable.js","/src/components")
-},{"_process":5,"buffer":2,"phaser":22}],12:[function(require,module,exports){
-(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
-var worldEntities;
-var Fighter = require('entities/ships/fighter');
-var instanceManager = require('instance-manager');
-
-module.exports = {
-	activeGenerator: null,
-	shipTypes: null,
-	rallyPoint: null,
-	
-	initComponentShipGenerate: function() {
-		worldEntities = instanceManager.get('worldEntities');
-		this.rallyPoint = {
-			x: this.x,
-			y: this.y,
-		};
-		this.generators = [
-			{
-				type: Fighter,
-				buildTime: 6000,
-				currentUnitBuildTime: 0,
-			}
-		];
-		
-		this.activeGenerator = this.generators[0];
-	},
-	
-	updateComponentShipGenerator: function() {
-		var newShip;
-		this.activeGenerator.currentUnitBuildTime += this.game.time.elapsed;
-		
-		if(this.activeGenerator.currentUnitBuildTime >= this.activeGenerator.buildTime) {
-			this.activeGenerator.currentUnitBuildTime = 0;
-			newShip = new this.activeGenerator.type({
-				x: this.x,
-				y: this.y,
-				ownedBy: 'player',
-			});
-			
-			worldEntities.addChild(newShip);
-			newShip.moveTo(this.x + 200, this.y + 75);
-		}
-	},
-};
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/components/ship-generator.js","/src/components")
-},{"_process":5,"buffer":2,"entities/ships/fighter":16,"instance-manager":19}],13:[function(require,module,exports){
+},{"_process":7,"buffer":4,"instance-manager":16,"lodash":8,"states":18,"states/play":19}],13:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 module.exports = {
 	screen: {
@@ -8493,7 +8508,7 @@ module.exports = {
 	}
 };
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/config.js","/src")
-},{"_process":5,"buffer":2}],14:[function(require,module,exports){
+},{"_process":7,"buffer":4}],14:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var _ = require('lodash');
 var Phaser = require('phaser');
@@ -8593,137 +8608,23 @@ Beam.create = function() {
 
 module.exports = Beam;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/entities/beam.js","/src/entities")
-},{"_process":5,"buffer":2,"instance-manager":19,"lodash":6,"phaser":22}],15:[function(require,module,exports){
+},{"_process":7,"buffer":4,"instance-manager":16,"lodash":8,"phaser":11}],15:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
-var _ = require('lodash');
-var EntityBase = require('entity-base');
-var ownableComponent = require('components/ownable');
-var selectableComponent = require('components/selectable');
-var shipGeneratorComponent = require('components/ship-generator');
+var ecs = require('ecs/ecs');
 
-function Planet(props) {
-	props.graphic = 'planet';
-	EntityBase.call(this, props);
-}
+module.exports = function(x, y) {
+	return ecs.createEntity({
+		graphic: 'planet',
+		x: x,
+		y: y,
+	})
+	.addComponent('ownable')
+	.addComponent('selectableComponent')
+	.addComponent('shipGeneratorComponent');
 
-Planet.prototype = Object.create(EntityBase.prototype);
-_.extend(
-	Planet.prototype,
-	ownableComponent,
-	selectableComponent,
-	shipGeneratorComponent, {
-		constructor: Planet,
-		update: function() {
-			this.runComponentUpdates();
-		},
-	}
-);
-
-module.exports = Planet;
+};
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/entities/planet.js","/src/entities")
-},{"_process":5,"buffer":2,"components/ownable":10,"components/selectable":11,"components/ship-generator":12,"entity-base":18,"lodash":6}],16:[function(require,module,exports){
-(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
-var _ = require('lodash');
-var ShipBase = require('entities/ships/ship-base');
-
-function Fighter(props) {
-	props.graphic = 'ship';
-	ShipBase.call(this, props);
-	
-	this.speed = 100;
-}
-
-Fighter.preload = function() {};
-
-Fighter.prototype = Object.create(ShipBase.prototype);
-_.extend(Fighter.prototype,
-	{
-		constructor: Fighter,
-	}
-);
-
-module.exports = Fighter;
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/entities/ships/fighter.js","/src/entities/ships")
-},{"_process":5,"buffer":2,"entities/ships/ship-base":17,"lodash":6}],17:[function(require,module,exports){
-(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
-var _ = require('lodash');
-var EntityBase = require('entity-base');
-var damageComponent = require('components/damage');
-var movementComponent = require('components/movement');
-var ownableComponent = require('components/ownable');
-var selectableComponent = require('components/selectable');
-
-function ShipBase(props) {
-	props.graphic = 'ship';
-	EntityBase.call(this, props);
-}
-
-ShipBase.preload = function() {};
-
-ShipBase.prototype = Object.create(EntityBase.prototype);
-_.extend(ShipBase.prototype,
-	damageComponent,
-	movementComponent,
-	ownableComponent,
-	selectableComponent, {
-		constructor: ShipBase,
-		update: function() {
-			this.runComponentUpdates();
-		},
-		rightClickHandler: function(x, y, shiftIsDown) {
-			this.moveTo(x, y, shiftIsDown);
-		}
-	}
-);
-
-module.exports = ShipBase;
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/entities/ships/ship-base.js","/src/entities/ships")
-},{"_process":5,"buffer":2,"components/damage":8,"components/movement":9,"components/ownable":10,"components/selectable":11,"entity-base":18,"lodash":6}],18:[function(require,module,exports){
-(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
-var _ = require('lodash'),
-	Phaser = require('phaser'),
-	instanceManager = require('instance-manager');
-
-function Entity(props) {
-	var key,
-		game = instanceManager.get('game');
-	Phaser.Sprite.call(this, game, props.x, props.y, props.graphic);
-	this.anchor.setTo(0.5, 0.5);
-	this.autoCull = true;
-	this._componentUpdates = [];
-	
-	// Run any initilizations that may be attached and
-	// register any component update logic. Prefix with "initComponent"
-	// and "updateComponent"
-	for(key in this) {
-		if(key.indexOf('initComponent') === 0) {
-			this[key](props);
-		} else if(key.indexOf('updateComponent') === 0) {
-			this._componentUpdates.push(key);
-		}
-	}
-	
-	this.update = this.runComponentUpdates.bind(this);
-}
-
-Entity.prototype = Object.create(Phaser.Sprite.prototype);
-_.extend(
-	Entity.prototype,
-	{
-		constructor: Entity,
-		update: null,
-		
-		runComponentUpdates: function() {
-			for(var i = 0; i < this._componentUpdates.length; i++) {
-				this[this._componentUpdates[i]]();
-			}
-		},
-	}
-);
-
-module.exports = Entity;
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/entity-base.js","/src")
-},{"_process":5,"buffer":2,"instance-manager":19,"lodash":6,"phaser":22}],19:[function(require,module,exports){
+},{"_process":7,"buffer":4,"ecs/ecs":10}],16:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 //Really, "Service Locator"...but whatever...  Using the
 //anti-pattern just to get this thing up.
@@ -8852,175 +8753,7 @@ instances = {};
 
 module.exports = instanceManager;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/instance-manager.js","/src")
-},{"_process":5,"buffer":2,"config":13,"interface/hud":21,"phaser":22}],20:[function(require,module,exports){
-(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
-var _ = require('lodash');
-var Phaser = require('phaser');
-var instanceManager = require('instance-manager');
-
-function DragSelection() {
-	var game = instanceManager.get('game');
-	Phaser.Graphics.call(this, game, 0, 0);
-
-	this.worldEntities = instanceManager.get('worldEntities');
-	this.endPoint = new Phaser.Point();
-	this.mouse = game.input.mouse;
-	this.alpha = 0.25;
-	this.visible = false;
-	this.entitySelected = false;
-	this.startDrag = false;
-	this.startSelection = false;
-	this.mousePointer = game.input.mousePointer;
-	this.controls = instanceManager.get('controls');
-	this.selectedEntities = null;
-	game.add.existing(this);
-	
-	this.x = this.y = -500;
-
-	// TODO Remove debug
-	window.dragSelection = this;
-}
-
-DragSelection.prototype = Object.create(Phaser.Graphics.prototype);
-_.extend(DragSelection.prototype, {
-	constructor: DragSelection,
-	update: function() {
-		var i,
-			entity,
-			entitiesLength,
-			dragX,
-			dragY,
-			localPoint;
-
-		if(this.mouse.button === 0) {
-			dragX = this.mousePointer.worldX;
-			dragY = this.mousePointer.worldY;
-
-			if(!this.startSelection) {
-				this.startSelection = true;
-				this.visible = true;
-				this.position.set(dragX - 10, dragY - 10);
-				
-				// TODO: One pass at drawing upon selection start to
-				// get correct bounds before the graphics have been rendered
-				// DRY up at a later time.
-				this.clear();
-				this.lineStyle(3, 0xFFFF0B);
-				this.beginFill(0xFFFF0B);
-				this.drawRect(0, 0, dragX - this.position.x, dragY - this.position.y);
-				this.endFill();
-				return;
-			} else if(!this.startDrag && (
-					Math.abs(dragX - this.position.x) > 10 || Math.abs(dragY - this.position.y) > 10
-				)
-			) {
-				this.startDrag = true;
-			}
-
-			this.clear();
-			this.lineStyle(3, 0xFFFF0B);
-			this.beginFill(0xFFFF0B);
-			this.drawRect(0, 0, dragX - this.position.x, dragY - this.position.y);
-			this.endFill();
-
-			entitiesLength = this.worldEntities.length;
-			
-			this.entitySelected = false;
-
-			for(i = 0; i < entitiesLength; i++) {
-				entity = this.worldEntities.getAt(i);
-
-				if(entity.isSelectable && entity.ownable && entity.isOwnedBy('player')) {
-					if((this.startDrag || !this.entitySelected) && this.getBounds().intersects(entity.getBounds()) ) {
-						this.entitySelected = true;
-						entity.select();
-					} else if(entity.isSelected) {
-						entity.deselect();
-					}
-				}
-			}
-		} else if(this.mouse.button === 2) {
-			this.registerRightClick = true;
-		} else if(this.registerRightClick) {
-			localPoint = this.game.input.getLocalPosition(this.worldEntities, this.game.input.mousePointer);
-			this.registerRightClick = false;
-			
-			this.sendRightClick(localPoint.x, localPoint.y);
-		} else if(this.startSelection) {
-			this.startSelection = false;
-			this.startDrag = false;
-			this.visible = false;
-
-		}
-	},
-
-	sendRightClick: function(x, y) {
-		var i,
-			entity,
-			avgX,
-			avgY,
-			maxX = this.game.world.height * 10,
-			maxY = this.game.world.width * 10,
-			minX = -1,
-			minY = -1,
-			xDiff,
-			yDiff,
-			xTotal = 0,
-			yTotal = 0,
-			rowCount,
-			slotWidth = 80,
-			movableSelectedCount = 0,
-			selectedEntities = [];
-
-		for(i = 0; i < this.worldEntities.length; i++) {
-			entity = this.worldEntities.getAt(i);
-
-			if(entity.isSelected) {
-				selectedEntities.push(entity);
-
-				if(entity.movable) {
-					movableSelectedCount++;
-					xTotal += entity.x;
-					yTotal += entity.y;
-					
-					if(entity.x > maxX) {
-						maxX = entity.x;
-					} else if(entity.x < minX) {
-						minX = entity.x;
-					}
-					
-					if(entity.y > maxY) {
-						maxY = entity.y;
-					} else if(entity.y < minY) {
-						minY = entity.y;
-					}
-				}
-			}
-		}
-		
-		//TOD Remove debug
-		window.selectedEntities = selectedEntities;
-		
-		rowCount = Math.sqrt(movableSelectedCount) | 0;
-
-		avgX = xTotal / movableSelectedCount;
-		avgY = yTotal / movableSelectedCount;
-		
-		for(i = 0; i < selectedEntities.length; i++) {
-			entity = selectedEntities[i];
-			
-			xDiff = slotWidth * (i % rowCount);
-			yDiff = slotWidth * ((i / rowCount)| 0);
-			entity.rightClickHandler(x + xDiff, y + yDiff, this.controls.shiftModifier.isDown);
-		}
-	},
-});
-
-//TOD Remove debug
-window.DragSelection = DragSelection;
-module.exports = DragSelection;
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/interface/drag-selection.js","/src/interface")
-},{"_process":5,"buffer":2,"instance-manager":19,"lodash":6,"phaser":22}],21:[function(require,module,exports){
+},{"_process":7,"buffer":4,"config":13,"interface/hud":17,"phaser":11}],17:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 //TODO Need better place to organize since not really an entity.  Maybe "interface" folder?
 var instanceManager = require('instance-manager');
@@ -9059,16 +8792,11 @@ Hud.preload = function(game) {
 
 module.exports = Hud;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/interface/hud.js","/src/interface")
-},{"_process":5,"buffer":2,"instance-manager":19}],22:[function(require,module,exports){
-(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
-//TODO get rid of this hack
-module.exports = window.Phaser;
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/phaser.js","/src")
-},{"_process":5,"buffer":2}],23:[function(require,module,exports){
+},{"_process":7,"buffer":4,"instance-manager":16}],18:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 module.exports = {};
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/states.js","/src")
-},{"_process":5,"buffer":2}],24:[function(require,module,exports){
+},{"_process":7,"buffer":4}],19:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var CONFIG = require('config');
 var _ = require('lodash');
@@ -9077,18 +8805,11 @@ var States = require('states');
 var Planet = require('entities/planet');
 var Beam = require('entities/beam');
 var Hud = require('interface/hud');
-var DragSelection = require('interface/drag-selection');
 var instanceManager = require('instance-manager');
 var game = instanceManager.get('game');
 
 States.Play = 'play';
 game.state.add(States.Play, {
-	_zoomMax: 300,
-	_zoomMin: 15,
-	_panSpeed: 8,
-	_zoomTween: null,
-	_zoomTarget: 100,	//%
-	_zoomIncrement: 5,	//%
 	worldEntities: null,
 	
 	preload: function(game) {
@@ -9109,35 +8830,13 @@ game.state.add(States.Play, {
 	},
 	
 	create: function(game) {
-		this.background1layer1 = game.add.tileSprite(CONFIG.screen.width * -0.25, CONFIG.screen.width * -0.25, CONFIG.screen.width * 1.25, CONFIG.screen.width * 1.25, 'background1-layer1');
-		this.background1layer2 = game.add.tileSprite(CONFIG.screen.width * -0.5, CONFIG.screen.width * -0.5, CONFIG.screen.width * 1.5, CONFIG.screen.width * 1.5, 'background1-layer2');
-		
 		game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
 		game.scale.setScreenSize();
-		window.worldEntities = this.worldEntities = instanceManager.get('worldEntities');
 		
-		window.addEventListener('mousewheel', _.bind(function(e) {
-			if(game.paused) {
-				return;
-			}
-
-			this._zoomTarget += this._zoomIncrement * (e.wheelDelta > 0 ? 1 : -1);
-
-			if(this._zoomTarget >= this._zoomMin && this._zoomTarget <= this._zoomMax) {
-				this.updateZoom();
-			} else {
-				this._zoomTarget = e.wheelDelta > 0 ? this._zoomMax : this._zoomMin;
-			}
-			
-			this.limitView();
-			this.updateBackground();
-
-		}, this));
-
 		game.world.setBounds(0, 0, CONFIG.stage.width, CONFIG.stage.height);
 		
 		//planets acting as markers to edges and center
-		this.worldEntities.add(new Planet({x: 0, y: CONFIG.stage.height / 2}));
+		/*this.worldEntities.add(new Planet({x: 0, y: CONFIG.stage.height / 2}));
 		this.worldEntities.add(new Planet({x: 0, y: 0}));
 		this.worldEntities.add(new Planet({x: CONFIG.stage.width / 2, y: CONFIG.stage.height / 2}));
 		this.worldEntities.add(new Planet({x: CONFIG.stage.width / 2, y: 0}));
@@ -9145,77 +8844,22 @@ game.state.add(States.Play, {
 		this.worldEntities.add(new Planet({x: CONFIG.stage.width / 2, y: CONFIG.stage.height}));
 		this.worldEntities.add(new Planet({x: 0, y: CONFIG.stage.height}));
 		this.worldEntities.add(new Planet({x: CONFIG.stage.width, y: 0}));
-		this.worldEntities.add(new Planet({x: CONFIG.stage.width, y: CONFIG.stage.height}));
+		this.worldEntities.add(new Planet({x: CONFIG.stage.width, y: CONFIG.stage.height}));*/
 		
 		generatePlanets();
 
-		this.dragSelection = new DragSelection(this.select);
-		this.controls = instanceManager.get('controls');
-	},
-	update: function(game) {
-		var dirtyBackground = false;
-		
-		// Vertial pan
-		if(this.controls.panUp.isDown) {
-			dirtyBackground = true;
-			this.worldEntities.y += this._panSpeed;
-		} else if(this.controls.panDown.isDown) {
-			dirtyBackground = true;
-			this.worldEntities.y -= this._panSpeed;
-		}
+		this.ecs = require('ecs/ecs');
 
-		// Horizontal pa
-		if(this.controls.panRight.isDown) {
-			dirtyBackground = true;
-			this.worldEntities.x -= this._panSpeed;
-		} else if(this.controls.panLeft.isDown) {
-			dirtyBackground = true;
-			this.worldEntities.x += this._panSpeed;
-		}
+		require('systems/registry');
+
+		this.ecs.runSystemInits();
+	},
+	update: function() {
 		
-		if(!dirtyBackground) {
-			return;
-		}
-		
-		this.limitView();
-		
-		this.updateBackground();
-		this.updateZoom();
+
+		this.ecs.runSystems();
 	},
 	
-	limitView: function() {
-		// Limit view
-		// Run check each tick to account for
-		// other position mutators such as zooming
-		if(this.worldEntities.y > 0) {
-			this.worldEntities.y = 0;
-		} else if(this.worldEntities.y < -(this.world.height * this.worldEntities.scale.y - game.camera.height)) {
-			this.worldEntities.y = -(this.world.height * this.worldEntities.scale.y - game.camera.height);
-		}
-		
-		if(this.worldEntities.x < -(this.world.width * this.worldEntities.scale.x - game.camera.width)) {
-			this.worldEntities.x = -(this.world.width * this.worldEntities.scale.x - game.camera.width);
-		} else if(this.worldEntities.x > 0) {
-			this.worldEntities.x = 0;
-		}
-	},
-	
-	updateBackground: function() {
-		this.background1layer1.position.x = this.background1layer1.width * 0.005  * this.worldEntities.x / this.game.width;
-		this.background1layer1.position.y = this.background1layer1.height * 0.005 * this.worldEntities.y / this.game.height;
-		this.background1layer2.position.x = this.background1layer2.width * 0.01 * this.worldEntities.x / this.game.width;
-		this.background1layer2.position.y = this.background1layer2.height * 0.01* this.worldEntities.y / this.game.height;
-	},
-
-	updateZoom: function() {
-		var zoom = this._zoomTarget / 100,
-			localPosition = this.game.input.getLocalPosition(this.worldEntities, game.input.mousePointer);
-
-		this.worldEntities.position.x += localPosition.x * (this.worldEntities.scale.x - zoom);
-		this.worldEntities.position.y += localPosition.y * (this.worldEntities.scale.y - zoom);
-		this.worldEntities.scale.setTo(zoom);
-	},
-
 	paused: function() {
 	},
 });
@@ -9226,14 +8870,23 @@ function generatePlanets() {
 		worldEntities = instanceManager.get('worldEntities');
 	
 	for(i = 0; i < 15; i++) {
-		worldEntities.add(new Planet({
+		/*worldEntities.add(new Planet({
 			x: _.random(100, CONFIG.stage.width - 100),
 			y: _.random(100, CONFIG.stage.height - 100),
-		}));
+		}));*/
 	}
 }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/states/play.js","/src/states")
-},{"_process":5,"buffer":2,"config":13,"entities/beam":14,"entities/planet":15,"instance-manager":19,"interface/drag-selection":20,"interface/hud":21,"lodash":6,"phaser":22,"states":23}]},{},[1])
+},{"_process":7,"buffer":4,"config":13,"ecs/ecs":10,"entities/beam":14,"entities/planet":15,"instance-manager":16,"interface/hud":17,"lodash":8,"phaser":11,"states":18,"systems/registry":20}],20:[function(require,module,exports){
+(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
+require('./camera');
+// require('./drag-selection');
+// require('./movement');
+// require('./selection');
+// require('./ship-production');
+//require('./universe-creation');
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/registry.js","/src/systems")
+},{"./camera":9,"_process":7,"buffer":4}]},{},[1])
 
 
 //# sourceMappingURL=bundle.js.map

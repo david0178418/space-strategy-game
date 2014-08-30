@@ -5,8 +5,7 @@ var source = require('vinyl-source-stream');
 var webserver = require('gulp-webserver');
 
 gulp.task('watch', function() {
-	"use strict";
-	gulp.watch('src/**/*.js', ['browserify']);
+	gulp.watch('./**/*.js', ['browserify']);
 });
 
 gulp.task('browserify', function(){
@@ -16,6 +15,7 @@ gulp.task('browserify', function(){
             insertGlobals: true,
             paths: [
                 './src',
+                'libs',
             ]
         })
         .bundle()
@@ -25,7 +25,6 @@ gulp.task('browserify', function(){
 });
 
 gulp.task('webserver', function() {
-	"use strict";
 	gulp.src('./')
 		.pipe(webserver({
 			open: false,
