@@ -26,8 +26,8 @@ window.instanceManager = instanceManager;
 var resources = {
 	game: {
 		init: function() {
-			var CONFIG = require('config'),
-				Phaser = require('phaser');
+			var CONFIG = require('config');
+			var Phaser = require('phaser');
 
 			//TODO remove debug global
 			window.game = new Phaser.Game(CONFIG.screen.width, CONFIG.screen.height, Phaser.AUTO, 'phaser');

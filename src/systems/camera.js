@@ -10,12 +10,13 @@ require('ecs/ecs').registerSystem('camera', {
 	init: function() {
 		var CONFIG = require('config');
 		var instanceManager = require('instance-manager');
-		this.worldEntities = instanceManager.get('worldEntities');
 		this.game = instanceManager.get('game');
 		this.controls = instanceManager.get('controls');
 		this.world = this.game.world;
+		
 		this.background1layer1 = this.game.add.tileSprite(CONFIG.screen.width * -0.25, CONFIG.screen.width * -0.25, CONFIG.screen.width * 1.25, CONFIG.screen.width * 1.25, 'background1-layer1');
 		this.background1layer2 = this.game.add.tileSprite(CONFIG.screen.width * -0.5, CONFIG.screen.width * -0.5, CONFIG.screen.width * 1.5, CONFIG.screen.width * 1.5, 'background1-layer2');
+		this.worldEntities = instanceManager.get('worldEntities');
 
 		window.addEventListener('mousewheel', _.bind(function(e) {
 			if(this.game.paused) {

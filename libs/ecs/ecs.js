@@ -6,8 +6,8 @@ module.exports = {
 	_initSystems: {},
 	_runSystems: {},
 	_components: {},
-	createEntity: function(props) {
-		var entity = new EntityBase(props);
+	createEntity: function(x, y, grraphic) {
+		var entity = new EntityBase(x, y, grraphic);
 		this._entities.push(entity);
 		return entity;
 	},

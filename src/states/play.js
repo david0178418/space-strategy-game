@@ -10,7 +10,6 @@ var game = instanceManager.get('game');
 
 States.Play = 'play';
 game.state.add(States.Play, {
-	worldEntities: null,
 	
 	preload: function(game) {
 		Hud.preload(game);
@@ -35,19 +34,6 @@ game.state.add(States.Play, {
 		
 		game.world.setBounds(0, 0, CONFIG.stage.width, CONFIG.stage.height);
 		
-		//planets acting as markers to edges and center
-		/*this.worldEntities.add(new Planet({x: 0, y: CONFIG.stage.height / 2}));
-		this.worldEntities.add(new Planet({x: 0, y: 0}));
-		this.worldEntities.add(new Planet({x: CONFIG.stage.width / 2, y: CONFIG.stage.height / 2}));
-		this.worldEntities.add(new Planet({x: CONFIG.stage.width / 2, y: 0}));
-		this.worldEntities.add(new Planet({x: CONFIG.stage.width, y: CONFIG.stage.height / 2}));
-		this.worldEntities.add(new Planet({x: CONFIG.stage.width / 2, y: CONFIG.stage.height}));
-		this.worldEntities.add(new Planet({x: 0, y: CONFIG.stage.height}));
-		this.worldEntities.add(new Planet({x: CONFIG.stage.width, y: 0}));
-		this.worldEntities.add(new Planet({x: CONFIG.stage.width, y: CONFIG.stage.height}));*/
-		
-		generatePlanets();
-
 		this.ecs = require('ecs/ecs');
 
 		require('systems/registry');
@@ -63,16 +49,3 @@ game.state.add(States.Play, {
 	paused: function() {
 	},
 });
-
-
-function generatePlanets() {
-	var i,
-		worldEntities = instanceManager.get('worldEntities');
-	
-	for(i = 0; i < 15; i++) {
-		/*worldEntities.add(new Planet({
-			x: _.random(100, CONFIG.stage.width - 100),
-			y: _.random(100, CONFIG.stage.height - 100),
-		}));*/
-	}
-}

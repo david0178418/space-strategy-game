@@ -3,4 +3,4 @@ require('./camera');
 // require('./movement');
 // require('./selection');
 // require('./ship-production');
-//require('./universe-creation');
+require('./universe-creation');

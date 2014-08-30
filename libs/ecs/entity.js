@@ -2,14 +2,14 @@ var _ = require('lodash');
 var instanceManager = require('instance-manager');
 var Phaser = require('phaser');
 
-function Entity(props) {
+function Entity(x, y, graphic) {
 	this.id = _.uniqueId('entity-');
 	this._components = {};
 	this._ecs = require('ecs/ecs');
 
 	var game = instanceManager.get('game');
 	
-	Phaser.Sprite.call(this, game, props.x, props.y, props.graphic);
+	Phaser.Sprite.call(this, game, x, y, graphic);
 	this.anchor.setTo(0.5, 0.5);
 	this.autoCull = true;
 }

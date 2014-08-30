@@ -14,7 +14,7 @@ gulp.task('browserify', function(){
             debug: true,
             insertGlobals: true,
             paths: [
-                './src',
+                'src',
                 'libs',
             ]
         })
