@@ -5,7 +5,7 @@ var intanceManager = require('instance-manager');
 require('ecs/ecs').registerSystem();
 
 module.exports = {
-	_paths: null,
+	paths: null,
 	moving: false,
 	movable: true,
 	
@@ -29,20 +29,20 @@ module.exports = {
 		
 		intanceManager.get('worldEntities').add(wayPointMarker);
 		
-		this._paths = this._paths || [];
+		this.paths = this.paths || [];
 		
 		if(!queueMovement) {
-			_.each(this._paths, function(path) {
+			_.each(this.paths, function(path) {
 				this._killPath(path);
 			}, this);
 			
-			this._paths = [];
-		} else if(this._paths.length) {
-			lastPath = _.last(this._paths);
+			this.paths = [];
+		} else if(this.paths.length) {
+			lastPath = _.last(this.paths);
 			startingPoint = lastPath.end;
 		}
 		
-		this._paths.push({
+		this.paths.push({
 			start: startingPoint,
 			end: endPoint,
 			graphic: wayPointMarker,
@@ -57,7 +57,7 @@ module.exports = {
 		
 		moveTween
 			.onComplete.add(function() {
-				this._paths = _.filter(this._paths, function(path) {
+				this.paths = _.filter(this.paths, function(path) {
 					if(path.graphic === wayPointMarker) {
 						this._killPath(path);
 						return false;

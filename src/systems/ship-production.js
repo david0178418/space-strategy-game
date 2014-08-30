@@ -1,44 +1,28 @@
-
-var worldEntities;
-var Fighter = require('entities/ships/fighter');
-var instanceManager = require('instance-manager');
-
-module.exports = {
-	activeGenerator: null,
-	shipTypes: null,
-	rallyPoint: null,
+require('ecs/ecs').registerSystem('ship-production', {
+	components: [
+		'ship-generator',
+	],
 	
-	initComponentShipGenerate: function() {
-		worldEntities = instanceManager.get('worldEntities');
-		this.rallyPoint = {
-			x: this.x,
-			y: this.y,
-		};
-		this.generators = [
-			{
-				type: Fighter,
-				buildTime: 6000,
-				currentUnitBuildTime: 0,
-			}
-		];
-		
-		this.activeGenerator = this.generators[0];
+	init: function() {
+		var instanceManager = require('instance-manager');
+		this.worldEntities = instanceManager.get('worldEntities');
+		this.game = instanceManager.get('game');
 	},
 	
-	updateComponentShipGenerator: function() {
+	runOne: function(entity) {
 		var newShip;
-		this.activeGenerator.currentUnitBuildTime += this.game.time.elapsed;
+		var shipGenerator = entity.getComponent('ship-generator');
+		var activeGenerator = shipGenerator.generators[shipGenerator.activeGenerator];
+
+		activeGenerator.currentUnitBuildTime += this.game.time.elapsed;
 		
-		if(this.activeGenerator.currentUnitBuildTime >= this.activeGenerator.buildTime) {
-			this.activeGenerator.currentUnitBuildTime = 0;
-			newShip = new this.activeGenerator.type({
-				x: this.x,
-				y: this.y,
-				ownedBy: 'player',
-			});
-			
-			worldEntities.addChild(newShip);
-			newShip.moveTo(this.x + 200, this.y + 75);
+		if(activeGenerator.currentUnitBuildTime >= activeGenerator.buildTime) {
+			activeGenerator.currentUnitBuildTime = 0;
+			newShip = activeGenerator.type(entity.x, entity.y);
+			newShip.components.ownable.ownedBy = entity.components.ownable.ownedBy;
+			//newShip.moveTo(entity.x + 200, entity.y + 75);
+
+			this.worldEntities.add(newShip);
 		}
 	},
-};
+});

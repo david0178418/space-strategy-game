@@ -36,7 +36,7 @@ module.exports = {
 
 	getEntities: function(components) {
 		return _.select(this._entities, function(entity) {
-			return !(_.difference(components, entity.getComponents()).length);
+			return entity.hasComponents(components);
 		});
 	},
 
@@ -56,7 +56,7 @@ module.exports = {
 			this._initSystems[name] = system;
 		}
 
-		if(system.run) {
+		if(system.run || system.runOne) {
 			this._runSystems[name] = system;
 		}
 	},
@@ -66,9 +66,21 @@ module.exports = {
 			system.init();
 		});
 	},
+
 	runSystems: function() {
+		/*jshint expr:true */
 		_.each(this._runSystems, function(system) {
-			system.run();
-		});
+			if(system.components) {
+				var entities = this.getEntities(system.components);
+
+				if(entities.length) {
+					system.run && system.run(entities);
+					system.runOne && _.map(entities, system.runOne, system);
+				}
+			} else {
+				system.run();
+			}
+			
+		}, this);
 	}
 };
