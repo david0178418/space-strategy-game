@@ -24,6 +24,8 @@ require('ecs/ecs').registerSystem('ship-production', {
 			newShip.components.ownable.ownedBy = entity.components.ownable.ownedBy;
 			//newShip.moveTo(entity.x + 200, entity.y + 75);
 			
+			// TODO Figure out why rally point reference is being copied
+			// even though deep cloning
 			newShip.addComponent('waypoints', {
 				points: _.cloneDeep([shipGenerator.rallyPoint]),
 			});
