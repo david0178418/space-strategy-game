@@ -1,3 +1,5 @@
+var _ = require('lodash');
+
 require('ecs/ecs').registerSystem('ship-production', {
 	components: [
 		'ship-generator',
@@ -23,7 +25,7 @@ require('ecs/ecs').registerSystem('ship-production', {
 			//newShip.moveTo(entity.x + 200, entity.y + 75);
 			
 			newShip.addComponent('waypoints', {
-				points: [shipGenerator.rallyPoint],
+				points: _.cloneDeep([shipGenerator.rallyPoint]),
 			});
 			
 			this.worldEntities.add(newShip);

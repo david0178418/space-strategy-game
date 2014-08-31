@@ -24,7 +24,7 @@ module.exports = {
 			return props;
 		}
 
-		return _.extend(props, component);
+		return _.merge({}, props, component);
 	},
 
 	destroyEntity: function(entity) {
@@ -43,7 +43,7 @@ module.exports = {
 	// @param {string} name
 	// @param {object} [defaultData={}] - provide an optional baseline for a component
 	registerComponent: function(name, defaultData) {
-		this._components[name] = defaultData;
+		this._components[name] = _.cloneDeep(defaultData);
 	},
 
 	// @param {string} name

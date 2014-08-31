@@ -8533,6 +8533,8 @@ require('ecs/ecs').registerSystem('movement', {
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/movement.js","/src/systems")
 },{"_process":6,"buffer":3,"ecs/ecs":12,"instance-manager":19,"lodash":7,"phaser":13}],10:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
+var _ = require('lodash');
+
 require('ecs/ecs').registerSystem('ship-production', {
 	components: [
 		'ship-generator',
@@ -8558,7 +8560,7 @@ require('ecs/ecs').registerSystem('ship-production', {
 			//newShip.moveTo(entity.x + 200, entity.y + 75);
 			
 			newShip.addComponent('waypoints', {
-				points: [shipGenerator.rallyPoint],
+				points: _.cloneDeep([shipGenerator.rallyPoint]),
 			});
 			
 			this.worldEntities.add(newShip);
@@ -8566,7 +8568,7 @@ require('ecs/ecs').registerSystem('ship-production', {
 	},
 });
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/ship-production.js","/src/systems")
-},{"_process":6,"buffer":3,"ecs/ecs":12,"instance-manager":19}],11:[function(require,module,exports){
+},{"_process":6,"buffer":3,"ecs/ecs":12,"instance-manager":19,"lodash":7}],11:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 require('ecs/ecs').registerSystem('universe-creation', {
 	init: function() {
@@ -8649,7 +8651,7 @@ module.exports = {
 			return props;
 		}
 
-		return _.extend(props, component);
+		return _.merge({}, props, component);
 	},
 
 	destroyEntity: function(entity) {
@@ -8668,7 +8670,7 @@ module.exports = {
 	// @param {string} name
 	// @param {object} [defaultData={}] - provide an optional baseline for a component
 	registerComponent: function(name, defaultData) {
-		this._components[name] = defaultData;
+		this._components[name] = _.cloneDeep(defaultData);
 	},
 
 	// @param {string} name
