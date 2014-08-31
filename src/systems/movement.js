@@ -14,43 +14,56 @@ require('ecs/ecs').registerSystem('movement', {
 	},
 
 	runOne: function(entity) {
-		//TODO figure out better waypoint structure
+		//TODO figure out better/more efficient waypoint structure
+		var activeWaypoint;
+		var waypoint;
+		var movementInProgress = false;
 		var waypoints = entity.components.waypoints.points;
-		var waypoint = waypoints[0];
 
-		if(!waypoint || waypoint.inProgress) {
-			return;
-		} else if(waypoint.complete) {
-			waypoints.splice(0, 1);
+		for(var i = 0; i < waypoints.length; i++) {
+			waypoint = waypoints[i];
 
-			if(!waypoints.length) {
-				entity.removeComponent('waypoints');
-				return;
+			if(waypoint.inProgress) {
+				movementInProgress = true;
 			}
 
-			waypoint = waypoints[0];
+			if(!waypoint.marker) {
+				waypoint.marker =  new Phaser.Sprite(this.game, waypoint.x, waypoint.y, 'waypointMarker');
+				waypoint.marker.anchor.setTo(0.5, 0.5);
+				this.worldEntities.add(waypoint.marker);
+			}
 		}
 
-		waypoint.inProgress = true;
+		if(!waypoints.length) {
+			// TODO Ensure new structure makes this block dead code.
+			entity.removeComponent('waypoints');
+			return;
+		}
 
-		var wayPointMarker = new Phaser.Sprite(this.game, waypoint.x, waypoint.y, 'waypointMarker');
-		var time = this.game.physics.arcade.distanceToXY(entity, waypoint.x, waypoint.y) * 1000 / entity.components.movable.speed;
-		var rotationTween = this.game.add.tween(entity).to({
-			rotation: Phaser.Point.angle(waypoint, entity.position),
+		if(movementInProgress) {
+			return;
+		}
+
+		activeWaypoint = waypoints[0];
+		activeWaypoint.inProgress = true;
+		
+		var time = this.game.physics.arcade.distanceToXY(entity, activeWaypoint.x, activeWaypoint.y) * 1000 / entity.components.movable.speed;
+
+		activeWaypoint.rotationTween = this.game.add.tween(entity).to({
+			rotation: Phaser.Point.angle(activeWaypoint, entity.position),
 		}, 500);
-		var moveTween = this.game.add.tween(entity.position).to(waypoint, time);
-		wayPointMarker.anchor.setTo(0.5, 0.5);
-		this.worldEntities.add(wayPointMarker);
-		moveTween
+		activeWaypoint.moveTween = this.game.add.tween(entity.position).to(activeWaypoint, time);
+		activeWaypoint.moveTween
 			.onComplete.add(function() {
-				wayPointMarker.destroy();
-				moveTween.stop();
-				rotationTween.stop();
+				this.marker.destroy();
+				this.moveTween.stop();
+				this.rotationTween.stop();
 				waypoint.inProgress = false;
-				waypoint.complete = true;
-			});
-		moveTween.start();
-		rotationTween.start();
+				waypoints.splice(0, 1);
+			}, activeWaypoint);
+
+		activeWaypoint.moveTween.start();
+		activeWaypoint.rotationTween.start();
 	},
 
 	moveTo: function(x, y, queueMovement) {
