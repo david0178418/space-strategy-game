@@ -37,6 +37,9 @@ _.extend(Entity.prototype, {
 	hasComponents: function(components) {
 		return _.all(components, this.hasComponent, this);
 	},
+	removeComponent: function(component) {
+		delete this.components[component];
+	},
 });
 
 module.exports = Entity;

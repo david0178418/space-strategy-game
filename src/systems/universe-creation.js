@@ -27,6 +27,9 @@ require('ecs/ecs').registerSystem('universe-creation', {
 
 			if (i === playerPlanet) {
 
+				worldEntities.x = -newPlanet.x + CONFIG.screen.width / 2;
+				worldEntities.y = -newPlanet.y + CONFIG.screen.height / 2;
+
 				newPlanet.addComponent('ship-generator', {
 					activeGenerator: 0,
 					generators: [

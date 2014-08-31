@@ -21,7 +21,11 @@ require('ecs/ecs').registerSystem('ship-production', {
 			newShip = activeGenerator.type(entity.x, entity.y);
 			newShip.components.ownable.ownedBy = entity.components.ownable.ownedBy;
 			//newShip.moveTo(entity.x + 200, entity.y + 75);
-
+			
+			newShip.addComponent('waypoints', {
+				points: [shipGenerator.rallyPoint],
+			});
+			
 			this.worldEntities.add(newShip);
 		}
 	},

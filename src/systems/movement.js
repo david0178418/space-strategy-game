@@ -1,14 +1,58 @@
 var _ = require('lodash');
 var Phaser = require('phaser');
-var intanceManager = require('instance-manager');
 
-require('ecs/ecs').registerSystem();
+require('ecs/ecs').registerSystem('movement', {
+	components: [
+		'movable',
+		'waypoints',
+	],
 
-module.exports = {
-	paths: null,
-	moving: false,
-	movable: true,
-	
+	init: function() {
+		var instanceManager = require('instance-manager');
+		this.game = instanceManager.get('game');
+		this.worldEntities = instanceManager.get('worldEntities');
+	},
+
+	runOne: function(entity) {
+		//TODO figure out better waypoint structure
+		var waypoints = entity.components.waypoints.points;
+		var waypoint = waypoints[0];
+
+		if(!waypoint || waypoint.inProgress) {
+			return;
+		} else if(waypoint.complete) {
+			waypoints.splice(0, 1);
+
+			if(!waypoints.length) {
+				entity.removeComponent('waypoints');
+				return;
+			}
+
+			waypoint = waypoints[0];
+		}
+
+		waypoint.inProgress = true;
+
+		var wayPointMarker = new Phaser.Sprite(this.game, waypoint.x, waypoint.y, 'waypointMarker');
+		var time = this.game.physics.arcade.distanceToXY(entity, waypoint.x, waypoint.y) * 1000 / entity.components.movable.speed;
+		var rotationTween = this.game.add.tween(entity).to({
+			rotation: Phaser.Point.angle(waypoint, entity.position),
+		}, 500);
+		var moveTween = this.game.add.tween(entity.position).to(waypoint, time);
+		wayPointMarker.anchor.setTo(0.5, 0.5);
+		this.worldEntities.add(wayPointMarker);
+		moveTween
+			.onComplete.add(function() {
+				wayPointMarker.destroy();
+				moveTween.stop();
+				rotationTween.stop();
+				waypoint.inProgress = false;
+				waypoint.complete = true;
+			});
+		moveTween.start();
+		rotationTween.start();
+	},
+
 	moveTo: function(x, y, queueMovement) {
 		var lastPath,
 			wayPointMarker = new Phaser.Sprite(this.game, x, y, 'waypointMarker'),
@@ -84,4 +128,4 @@ module.exports = {
 		path.move.stop();
 		path.rotation.stop();
 	}
-};
+});

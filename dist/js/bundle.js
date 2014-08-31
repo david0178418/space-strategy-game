@@ -3,7 +3,7 @@
 var App = require('app');
 new App('#app');
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/main.js","/")
-},{"_process":6,"app":13,"buffer":3}],2:[function(require,module,exports){
+},{"_process":6,"app":14,"buffer":3}],2:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var _ = require('lodash');
 var instanceManager = require('instance-manager');
@@ -44,11 +44,14 @@ _.extend(Entity.prototype, {
 	hasComponents: function(components) {
 		return _.all(components, this.hasComponent, this);
 	},
+	removeComponent: function(component) {
+		delete this.components[component];
+	},
 });
 
 module.exports = Entity;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/libs/ecs/entity.js","/libs/ecs")
-},{"_process":6,"buffer":3,"ecs/ecs":11,"instance-manager":18,"lodash":7,"phaser":12}],3:[function(require,module,exports){
+},{"_process":6,"buffer":3,"ecs/ecs":12,"instance-manager":19,"lodash":7,"phaser":13}],3:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /*!
  * The buffer module from node.js, for the browser.
@@ -8394,7 +8397,141 @@ require('ecs/ecs').registerSystem('camera', {
 	},
 });
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/camera.js","/src/systems")
-},{"_process":6,"buffer":3,"config":14,"ecs/ecs":11,"instance-manager":18,"lodash":7}],9:[function(require,module,exports){
+},{"_process":6,"buffer":3,"config":15,"ecs/ecs":12,"instance-manager":19,"lodash":7}],9:[function(require,module,exports){
+(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
+var _ = require('lodash');
+var Phaser = require('phaser');
+
+require('ecs/ecs').registerSystem('movement', {
+	components: [
+		'movable',
+		'waypoints',
+	],
+
+	init: function() {
+		var instanceManager = require('instance-manager');
+		this.game = instanceManager.get('game');
+		this.worldEntities = instanceManager.get('worldEntities');
+	},
+
+	runOne: function(entity) {
+		//TODO figure out better waypoint structure
+		var waypoints = entity.components.waypoints.points;
+		var waypoint = waypoints[0];
+
+		if(!waypoint || waypoint.inProgress) {
+			return;
+		} else if(waypoint.complete) {
+			waypoints.splice(0, 1);
+
+			if(!waypoints.length) {
+				entity.removeComponent('waypoints');
+				return;
+			}
+
+			waypoint = waypoints[0];
+		}
+
+		waypoint.inProgress = true;
+
+		var wayPointMarker = new Phaser.Sprite(this.game, waypoint.x, waypoint.y, 'waypointMarker');
+		var time = this.game.physics.arcade.distanceToXY(entity, waypoint.x, waypoint.y) * 1000 / entity.components.movable.speed;
+		var rotationTween = this.game.add.tween(entity).to({
+			rotation: Phaser.Point.angle(waypoint, entity.position),
+		}, 500);
+		var moveTween = this.game.add.tween(entity.position).to(waypoint, time);
+		wayPointMarker.anchor.setTo(0.5, 0.5);
+		this.worldEntities.add(wayPointMarker);
+		moveTween
+			.onComplete.add(function() {
+				wayPointMarker.destroy();
+				moveTween.stop();
+				rotationTween.stop();
+				waypoint.inProgress = false;
+				waypoint.complete = true;
+			});
+		moveTween.start();
+		rotationTween.start();
+	},
+
+	moveTo: function(x, y, queueMovement) {
+		var lastPath,
+			wayPointMarker = new Phaser.Sprite(this.game, x, y, 'waypointMarker'),
+			startingPoint = this.position,
+			endPoint = {
+				x: x,
+				y: y,
+			},
+			time = this.game.physics.arcade.distanceToXY(this, x, y) * 1000 / this.speed,
+			rotationTween = this.game.add.tween(this),
+			moveTween = this.game.add.tween(this.position).
+				to({
+					x:x,
+					y:y,
+				}, time);
+		
+		wayPointMarker.anchor.setTo(0.5, 0.5);
+		
+		intanceManager.get('worldEntities').add(wayPointMarker);
+		
+		this.paths = this.paths || [];
+		
+		if(!queueMovement) {
+			_.each(this.paths, function(path) {
+				this._killPath(path);
+			}, this);
+			
+			this.paths = [];
+		} else if(this.paths.length) {
+			lastPath = _.last(this.paths);
+			startingPoint = lastPath.end;
+		}
+		
+		this.paths.push({
+			start: startingPoint,
+			end: endPoint,
+			graphic: wayPointMarker,
+			move: moveTween,
+			rotation: rotationTween,
+		});
+		
+		rotationTween.to({
+			rotation: Phaser.Point.angle(endPoint, startingPoint),
+		}, 500);
+		
+		
+		moveTween
+			.onComplete.add(function() {
+				this.paths = _.filter(this.paths, function(path) {
+					if(path.graphic === wayPointMarker) {
+						this._killPath(path);
+						return false;
+					} else {
+						return true;
+					}
+					
+				}, this);
+			}, this);
+		
+		if(queueMovement && lastPath) {
+			lastPath.move.onComplete.add(function() {
+				moveTween.start();
+				rotationTween.start();	
+			});
+		} else {
+			moveTween.start();
+			rotationTween.start();
+		}
+	},
+	
+	_killPath: function(path) {
+		path.graphic.destroy();
+		path.move.stop();
+		path.rotation.stop();
+	}
+});
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/movement.js","/src/systems")
+},{"_process":6,"buffer":3,"ecs/ecs":12,"instance-manager":19,"lodash":7,"phaser":13}],10:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 require('ecs/ecs').registerSystem('ship-production', {
 	components: [
@@ -8419,13 +8556,17 @@ require('ecs/ecs').registerSystem('ship-production', {
 			newShip = activeGenerator.type(entity.x, entity.y);
 			newShip.components.ownable.ownedBy = entity.components.ownable.ownedBy;
 			//newShip.moveTo(entity.x + 200, entity.y + 75);
-
+			
+			newShip.addComponent('waypoints', {
+				points: [shipGenerator.rallyPoint],
+			});
+			
 			this.worldEntities.add(newShip);
 		}
 	},
 });
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/ship-production.js","/src/systems")
-},{"_process":6,"buffer":3,"ecs/ecs":11,"instance-manager":18}],10:[function(require,module,exports){
+},{"_process":6,"buffer":3,"ecs/ecs":12,"instance-manager":19}],11:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 require('ecs/ecs').registerSystem('universe-creation', {
 	init: function() {
@@ -8456,6 +8597,9 @@ require('ecs/ecs').registerSystem('universe-creation', {
 
 			if (i === playerPlanet) {
 
+				worldEntities.x = -newPlanet.x + CONFIG.screen.width / 2;
+				worldEntities.y = -newPlanet.y + CONFIG.screen.height / 2;
+
 				newPlanet.addComponent('ship-generator', {
 					activeGenerator: 0,
 					generators: [
@@ -8477,7 +8621,7 @@ require('ecs/ecs').registerSystem('universe-creation', {
 	},
 });
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/universe-creation.js","/src/systems")
-},{"_process":6,"buffer":3,"config":14,"ecs/ecs":11,"entities/fighter":16,"entities/planet":17,"instance-manager":18,"lodash":7}],11:[function(require,module,exports){
+},{"_process":6,"buffer":3,"config":15,"ecs/ecs":12,"entities/fighter":17,"entities/planet":18,"instance-manager":19,"lodash":7}],12:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var _ = require('lodash');
 var EntityBase = require('./entity');
@@ -8566,12 +8710,12 @@ module.exports = {
 	}
 };
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/libs/ecs/ecs.js","/libs/ecs")
-},{"./entity":2,"_process":6,"buffer":3,"lodash":7}],12:[function(require,module,exports){
+},{"./entity":2,"_process":6,"buffer":3,"lodash":7}],13:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 //TODO get rid of this hack
 module.exports = window.Phaser;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/libs/phaser.js","/libs")
-},{"_process":6,"buffer":3}],13:[function(require,module,exports){
+},{"_process":6,"buffer":3}],14:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var _ = require('lodash');
 var States = require('states');
@@ -8589,7 +8733,7 @@ module.exports = function() {
 	});
 };
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/app.js","/src")
-},{"_process":6,"buffer":3,"instance-manager":18,"lodash":7,"states":20,"states/play":21}],14:[function(require,module,exports){
+},{"_process":6,"buffer":3,"instance-manager":19,"lodash":7,"states":21,"states/play":22}],15:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 module.exports = {
 	screen: {
@@ -8602,7 +8746,7 @@ module.exports = {
 	}
 };
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/config.js","/src")
-},{"_process":6,"buffer":3}],15:[function(require,module,exports){
+},{"_process":6,"buffer":3}],16:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var _ = require('lodash');
 var Phaser = require('phaser');
@@ -8702,7 +8846,7 @@ Beam.create = function() {
 
 module.exports = Beam;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/entities/beam.js","/src/entities")
-},{"_process":6,"buffer":3,"instance-manager":18,"lodash":7,"phaser":12}],16:[function(require,module,exports){
+},{"_process":6,"buffer":3,"instance-manager":19,"lodash":7,"phaser":13}],17:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var ecs = require('ecs/ecs');
 
@@ -8715,7 +8859,7 @@ module.exports = function(x, y) {
 	});
 };
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/entities/fighter.js","/src/entities")
-},{"_process":6,"buffer":3,"ecs/ecs":11}],17:[function(require,module,exports){
+},{"_process":6,"buffer":3,"ecs/ecs":12}],18:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var ecs = require('ecs/ecs');
 
@@ -8723,7 +8867,7 @@ module.exports = function(x, y) {
 	var planet = ecs.createEntity(x, y, 'planet')
 		.addComponent('ownable')
 		.addComponent('selectable');
-
+	
 	planet.smoothed = false;
 
 	return planet;
@@ -8731,7 +8875,7 @@ module.exports = function(x, y) {
 
 window.planet = module.exports;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/entities/planet.js","/src/entities")
-},{"_process":6,"buffer":3,"ecs/ecs":11}],18:[function(require,module,exports){
+},{"_process":6,"buffer":3,"ecs/ecs":12}],19:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 //Really, "Service Locator"...but whatever...  Using the
 //anti-pattern just to get this thing up.
@@ -8860,7 +9004,7 @@ instances = {};
 
 module.exports = instanceManager;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/instance-manager.js","/src")
-},{"_process":6,"buffer":3,"config":14,"interface/hud":19,"phaser":12}],19:[function(require,module,exports){
+},{"_process":6,"buffer":3,"config":15,"interface/hud":20,"phaser":13}],20:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 //TODO Need better place to organize since not really an entity.  Maybe "interface" folder?
 var instanceManager = require('instance-manager');
@@ -8899,11 +9043,11 @@ Hud.preload = function(game) {
 
 module.exports = Hud;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/interface/hud.js","/src/interface")
-},{"_process":6,"buffer":3,"instance-manager":18}],20:[function(require,module,exports){
+},{"_process":6,"buffer":3,"instance-manager":19}],21:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 module.exports = {};
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/states.js","/src")
-},{"_process":6,"buffer":3}],21:[function(require,module,exports){
+},{"_process":6,"buffer":3}],22:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var CONFIG = require('config');
 var _ = require('lodash');
@@ -8957,16 +9101,16 @@ game.state.add(States.Play, {
 	},
 });
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/states/play.js","/src/states")
-},{"_process":6,"buffer":3,"config":14,"ecs/ecs":11,"entities/beam":15,"entities/planet":17,"instance-manager":18,"interface/hud":19,"lodash":7,"phaser":12,"states":20,"systems/registry":22}],22:[function(require,module,exports){
+},{"_process":6,"buffer":3,"config":15,"ecs/ecs":12,"entities/beam":16,"entities/planet":18,"instance-manager":19,"interface/hud":20,"lodash":7,"phaser":13,"states":21,"systems/registry":23}],23:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 require('./camera');
 // require('./drag-selection');
-// /require('./movement');
+require('./movement');
 // require('./selection');
 require('./ship-production');
 require('./universe-creation');
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/registry.js","/src/systems")
-},{"./camera":8,"./ship-production":9,"./universe-creation":10,"_process":6,"buffer":3}]},{},[1])
+},{"./camera":8,"./movement":9,"./ship-production":10,"./universe-creation":11,"_process":6,"buffer":3}]},{},[1])
 
 
 //# sourceMappingURL=bundle.js.map
