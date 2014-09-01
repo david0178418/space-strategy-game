@@ -8304,12 +8304,14 @@ process.chdir = function (dir) {
 var _ = require('lodash');
 
 require('ecs/ecs').registerSystem('camera', {
+	dirtyBackground: true,
+	panSpeed: 8,
+	zoomIncrement: 5,	//%
 	zoomMax: 300,
 	zoomMin: 15,
-	panSpeed: 8,
 	zoomTween: null,
 	zoomTarget: 100,	//%
-	zoomIncrement: 5,	//%
+
 	init: function() {
 		var CONFIG = require('config');
 		var instanceManager = require('instance-manager');
@@ -8322,52 +8324,38 @@ require('ecs/ecs').registerSystem('camera', {
 		this.worldEntities = instanceManager.get('worldEntities');
 
 		window.addEventListener('mousewheel', _.bind(function(e) {
-			if(this.game.paused) {
-				return;
-			}
-
-			this.zoomTarget += this.zoomIncrement * (e.wheelDelta > 0 ? 1 : -1);
-
-			if(this.zoomTarget >= this.zoomMin && this.zoomTarget <= this.zoomMax) {
-				this.updateZoom();
-			} else {
-				this.zoomTarget = e.wheelDelta > 0 ? this.zoomMax : this.zoomMin;
-			}
-			
-			this.limitView();
-			this.updateBackground();
-
+			this.updateZoomTarget(e.wheelDelta);
 		}, this));
 	},
 
 	run: function() {
-		var dirtyBackground = false;
-		
 		// Vertial pan
 		if(this.controls.panUp.isDown) {
-			dirtyBackground = true;
+			this.dirtyBackground = true;
 			this.worldEntities.y += this.panSpeed;
 		} else if(this.controls.panDown.isDown) {
-			dirtyBackground = true;
+			this.dirtyBackground = true;
 			this.worldEntities.y -= this.panSpeed;
 		}
 
 		// Horizontal pa
 		if(this.controls.panRight.isDown) {
-			dirtyBackground = true;
+			this.dirtyBackground = true;
 			this.worldEntities.x -= this.panSpeed;
 		} else if(this.controls.panLeft.isDown) {
-			dirtyBackground = true;
+			this.dirtyBackground = true;
 			this.worldEntities.x += this.panSpeed;
 		}
 		
-		if(!dirtyBackground) {
+		if(!this.dirtyBackground) {
 			return;
 		}
 		
 		this.updateBackground();
 		this.updateZoom();
 		this.limitView();
+
+		this.dirtyBackground = false;
 	},
 	limitView: function() {
 		// Limit view
@@ -8401,6 +8389,23 @@ require('ecs/ecs').registerSystem('camera', {
 		this.worldEntities.position.y += localPosition.y * (this.worldEntities.scale.y - zoom);
 		this.worldEntities.scale.setTo(zoom);
 	},
+	updateZoomTarget: function(delta) {
+		if(this.game.paused) {
+			return;
+		}
+
+		this.zoomTarget += this.zoomIncrement * (delta > 0 ? 1 : -1);
+
+		if(this.zoomTarget >= this.zoomMin && this.zoomTarget <= this.zoomMax) {
+			this.updateZoom();
+		} else {
+			this.zoomTarget = delta > 0 ? this.zoomMax : this.zoomMin;
+		}
+		
+		this.limitView();
+		this.updateBackground();
+
+	}
 });
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/camera.js","/src/systems")
 },{"_process":6,"buffer":3,"config":18,"ecs/ecs":15,"instance-manager":22,"lodash":7}],9:[function(require,module,exports){
