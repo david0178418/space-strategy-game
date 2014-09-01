@@ -62,10 +62,9 @@ require('ecs/ecs').registerSystem('camera', {
 			return;
 		}
 		
-		this.limitView();
-		
 		this.updateBackground();
 		this.updateZoom();
+		this.limitView();
 	},
 	limitView: function() {
 		// Limit view

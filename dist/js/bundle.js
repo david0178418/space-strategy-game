@@ -8365,10 +8365,9 @@ require('ecs/ecs').registerSystem('camera', {
 			return;
 		}
 		
-		this.limitView();
-		
 		this.updateBackground();
 		this.updateZoom();
+		this.limitView();
 	},
 	limitView: function() {
 		// Limit view
@@ -8418,7 +8417,6 @@ require('ecs/ecs').registerSystem('drag-selection', {
 	mouse: game.input.mouse,
 	mousePointer: game.input.mousePointer,
 	registerRightClick: false,
-	selectedEntities: null,
 	startDrag: false,
 	startSelection: false,
 	worldEntities: instanceManager.get('worldEntities'),
@@ -8496,19 +8494,47 @@ require('ecs/ecs').registerSystem('drag-selection', {
 
 			for(i = 0; i < entities.length; i++) {
 				entity = entities[i];
+				selectableComponent = entity.components.selectable;
 
-				if(entity.components.movable && entity.components.ownable.ownedBy === 'player') {
-					entity.components['group-movement'] = { centralPoint: localPoint};
+				if(entity.components.movable && selectableComponent.selected && entity.components.ownable.ownedBy === 'player') {
+					entity.components['group-movement'] = {
+						override: this.controls.shiftModifier.isDown,
+						centralPoint: localPoint,
+					};
 				}
 			}
 
 			this.registerRightClick = false;
+			this.markClickLocation(localPoint);
 		} else if(this.startSelection) {
 			this.startSelection = false;
 			this.startDrag = false;
 			this.graphic.visible = false;
 
 		}
+	},
+
+	markClickLocation: function(point) {
+		var marker = new Phaser.Sprite(this.game, point.x, point.y, 'waypointMarker');
+		var markerAnimationTime = 250;
+		var markerTween;
+
+		marker.anchor.setTo(0.5, 0.5);
+		this.worldEntities.add(marker);
+
+		markerTween = this.game.add.tween(marker.scale).to({
+			x: 4,
+			y: 4,
+		}, markerAnimationTime);
+
+		markerTween.onComplete.add(function() {
+			marker.destroy();
+		});
+
+		this.game.add.tween(marker).to({
+			alpha: 0,
+		}, markerAnimationTime).start();
+		markerTween.start();
 	},
 });
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/drag-selection.js","/src/systems")
@@ -8523,14 +8549,15 @@ require('ecs/ecs').registerSystem('formation', {
 		var instanceManager = require('instance-manager');
 		this.game = instanceManager.get('game');
 		this.worldEntities = instanceManager.get('worldEntities');
-		this.controls = instanceManager.get('controls');
 	},
 
 	run: function(entities) {
 		var avgX;
 		var avgY;
-		var destination = entities[0].components['group-movement'].centralPoint;
+		var groupMovementComponent = entities[0].components['group-movement'];
 		var entity;
+		var formationPositionX;
+		var formationPositionY;
 		var i;
 		var maxX = this.game.world.height * 10;
 		var maxY = this.game.world.width * 10;
@@ -8540,9 +8567,7 @@ require('ecs/ecs').registerSystem('formation', {
 		var rowCount;
 		var slotWidth = 80;
 		var waypointsComponent;
-		var xDiff;
 		var xTotal = 0;
-		var yDiff;
 		var yTotal = 0;
 
 		for(i = 0; i < entities.length; i++) {
@@ -8572,15 +8597,15 @@ require('ecs/ecs').registerSystem('formation', {
 		for(i = 0; i < entities.length; i++) {
 			entity = entities[i];
 			
-			xDiff = slotWidth * (i % rowCount);
-			yDiff = slotWidth * ((i / rowCount)| 0);
+			formationPositionX = groupMovementComponent.centralPoint.x + slotWidth * (i % rowCount);
+			formationPositionY = groupMovementComponent.centralPoint.y + slotWidth * ((i / rowCount)| 0);
 
 			waypointsComponent = entity.components.waypoints;
 
-			if(this.controls.shiftModifier.isDown && waypointsComponent && waypointsComponent.inProgress) {
+			if(groupMovementComponent.override && waypointsComponent && waypointsComponent.inProgress) {
 				entity.components.waypoints.queued.push({
-					x: destination.x + xDiff,
-					y: destination.y + yDiff,
+					x: formationPositionX,
+					y: formationPositionY,
 				});
 			} else {
 				if(waypointsComponent && waypointsComponent.inProgress) {
@@ -8590,8 +8615,8 @@ require('ecs/ecs').registerSystem('formation', {
 				entity.components.waypoints = {
 					queued: [
 						{
-							x: destination.x + xDiff,
-							y: destination.y + yDiff,
+							x: formationPositionX,
+							y: formationPositionY,
 						}
 					]
 				};
@@ -8601,7 +8626,6 @@ require('ecs/ecs').registerSystem('formation', {
 		}
 	},
 	stopMovement: function(waypoint) {
-		waypoint.marker.destroy();
 		waypoint.moveTween.stop();
 		waypoint.rotationTween.stop();
 	}
@@ -8637,12 +8661,6 @@ require('ecs/ecs').registerSystem('movement', {
 
 		for(var i = 0; i < queuedWaypoints.length; i++) {
 			waypoint = queuedWaypoints[i];
-
-			if(!waypoint.marker) {
-				waypoint.marker =  new Phaser.Sprite(this.game, waypoint.x, waypoint.y, 'waypointMarker');
-				waypoint.marker.anchor.setTo(0.5, 0.5);
-				this.worldEntities.add(waypoint.marker);
-			}
 		}
 
 		if(!inProgressWaypoint && !queuedWaypoints.length) {
@@ -8665,7 +8683,6 @@ require('ecs/ecs').registerSystem('movement', {
 
 		inProgressWaypoint.moveTween
 			.onComplete.add(function() {
-				this.marker.destroy();
 				this.moveTween.stop();
 				this.rotationTween.stop();
 				this.complete = true;

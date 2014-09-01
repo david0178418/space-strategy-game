@@ -26,12 +26,6 @@ require('ecs/ecs').registerSystem('movement', {
 
 		for(var i = 0; i < queuedWaypoints.length; i++) {
 			waypoint = queuedWaypoints[i];
-
-			if(!waypoint.marker) {
-				waypoint.marker =  new Phaser.Sprite(this.game, waypoint.x, waypoint.y, 'waypointMarker');
-				waypoint.marker.anchor.setTo(0.5, 0.5);
-				this.worldEntities.add(waypoint.marker);
-			}
 		}
 
 		if(!inProgressWaypoint && !queuedWaypoints.length) {
@@ -54,7 +48,6 @@ require('ecs/ecs').registerSystem('movement', {
 
 		inProgressWaypoint.moveTween
 			.onComplete.add(function() {
-				this.marker.destroy();
 				this.moveTween.stop();
 				this.rotationTween.stop();
 				this.complete = true;

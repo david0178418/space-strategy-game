@@ -7,14 +7,15 @@ require('ecs/ecs').registerSystem('formation', {
 		var instanceManager = require('instance-manager');
 		this.game = instanceManager.get('game');
 		this.worldEntities = instanceManager.get('worldEntities');
-		this.controls = instanceManager.get('controls');
 	},
 
 	run: function(entities) {
 		var avgX;
 		var avgY;
-		var destination = entities[0].components['group-movement'].centralPoint;
+		var groupMovementComponent = entities[0].components['group-movement'];
 		var entity;
+		var formationPositionX;
+		var formationPositionY;
 		var i;
 		var maxX = this.game.world.height * 10;
 		var maxY = this.game.world.width * 10;
@@ -24,9 +25,7 @@ require('ecs/ecs').registerSystem('formation', {
 		var rowCount;
 		var slotWidth = 80;
 		var waypointsComponent;
-		var xDiff;
 		var xTotal = 0;
-		var yDiff;
 		var yTotal = 0;
 
 		for(i = 0; i < entities.length; i++) {
@@ -56,15 +55,15 @@ require('ecs/ecs').registerSystem('formation', {
 		for(i = 0; i < entities.length; i++) {
 			entity = entities[i];
 			
-			xDiff = slotWidth * (i % rowCount);
-			yDiff = slotWidth * ((i / rowCount)| 0);
+			formationPositionX = groupMovementComponent.centralPoint.x + slotWidth * (i % rowCount);
+			formationPositionY = groupMovementComponent.centralPoint.y + slotWidth * ((i / rowCount)| 0);
 
 			waypointsComponent = entity.components.waypoints;
 
-			if(this.controls.shiftModifier.isDown && waypointsComponent && waypointsComponent.inProgress) {
+			if(groupMovementComponent.override && waypointsComponent && waypointsComponent.inProgress) {
 				entity.components.waypoints.queued.push({
-					x: destination.x + xDiff,
-					y: destination.y + yDiff,
+					x: formationPositionX,
+					y: formationPositionY,
 				});
 			} else {
 				if(waypointsComponent && waypointsComponent.inProgress) {
@@ -74,8 +73,8 @@ require('ecs/ecs').registerSystem('formation', {
 				entity.components.waypoints = {
 					queued: [
 						{
-							x: destination.x + xDiff,
-							y: destination.y + yDiff,
+							x: formationPositionX,
+							y: formationPositionY,
 						}
 					]
 				};
@@ -85,7 +84,6 @@ require('ecs/ecs').registerSystem('formation', {
 		}
 	},
 	stopMovement: function(waypoint) {
-		waypoint.marker.destroy();
 		waypoint.moveTween.stop();
 		waypoint.rotationTween.stop();
 	}

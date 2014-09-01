@@ -10,7 +10,6 @@ require('ecs/ecs').registerSystem('drag-selection', {
 	mouse: game.input.mouse,
 	mousePointer: game.input.mousePointer,
 	registerRightClick: false,
-	selectedEntities: null,
 	startDrag: false,
 	startSelection: false,
 	worldEntities: instanceManager.get('worldEntities'),
@@ -88,18 +87,46 @@ require('ecs/ecs').registerSystem('drag-selection', {
 
 			for(i = 0; i < entities.length; i++) {
 				entity = entities[i];
+				selectableComponent = entity.components.selectable;
 
-				if(entity.components.movable && entity.components.ownable.ownedBy === 'player') {
-					entity.components['group-movement'] = { centralPoint: localPoint};
+				if(entity.components.movable && selectableComponent.selected && entity.components.ownable.ownedBy === 'player') {
+					entity.components['group-movement'] = {
+						override: this.controls.shiftModifier.isDown,
+						centralPoint: localPoint,
+					};
 				}
 			}
 
 			this.registerRightClick = false;
+			this.markClickLocation(localPoint);
 		} else if(this.startSelection) {
 			this.startSelection = false;
 			this.startDrag = false;
 			this.graphic.visible = false;
 
 		}
+	},
+
+	markClickLocation: function(point) {
+		var marker = new Phaser.Sprite(this.game, point.x, point.y, 'waypointMarker');
+		var markerAnimationTime = 250;
+		var markerTween;
+
+		marker.anchor.setTo(0.5, 0.5);
+		this.worldEntities.add(marker);
+
+		markerTween = this.game.add.tween(marker.scale).to({
+			x: 4,
+			y: 4,
+		}, markerAnimationTime);
+
+		markerTween.onComplete.add(function() {
+			marker.destroy();
+		});
+
+		this.game.add.tween(marker).to({
+			alpha: 0,
+		}, markerAnimationTime).start();
+		markerTween.start();
 	},
 });
