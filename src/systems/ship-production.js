@@ -26,7 +26,7 @@ require('ecs/ecs').registerSystem('ship-production', {
 			// TODO Figure out why rally point reference is being copied
 			// even though deep cloning
 			newShip.addComponent('waypoints', {
-				points: [_.cloneDeep(shipGenerator.rallyPoint)],
+				queued: [_.cloneDeep(shipGenerator.rallyPoint)],
 			});
 			
 			this.worldEntities.add(newShip);

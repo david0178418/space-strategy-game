@@ -1,4 +1,3 @@
-var _ = require('lodash');
 var Phaser = require('phaser');
 
 require('ecs/ecs').registerSystem('movement', {
@@ -15,17 +14,18 @@ require('ecs/ecs').registerSystem('movement', {
 
 	runOne: function(entity) {
 		//TODO figure out better/more efficient waypoint structure
-		var activeWaypoint;
+		var inProgressWaypoint = entity.components.waypoints.inProgress;
+		var queuedWaypoints = entity.components.waypoints.queued;
 		var waypoint;
-		var movementInProgress = false;
-		var waypoints = entity.components.waypoints.points;
+		var time;
 
-		for(var i = 0; i < waypoints.length; i++) {
-			waypoint = waypoints[i];
+		if(inProgressWaypoint && inProgressWaypoint.complete) {
+			entity.components.waypoints.inProgress = null;
+			inProgressWaypoint = null;
+		}
 
-			if(waypoint.inProgress) {
-				movementInProgress = true;
-			}
+		for(var i = 0; i < queuedWaypoints.length; i++) {
+			waypoint = queuedWaypoints[i];
 
 			if(!waypoint.marker) {
 				waypoint.marker =  new Phaser.Sprite(this.game, waypoint.x, waypoint.y, 'waypointMarker');
@@ -34,35 +34,33 @@ require('ecs/ecs').registerSystem('movement', {
 			}
 		}
 
-		if(!waypoints.length) {
+		if(!inProgressWaypoint && !queuedWaypoints.length) {
 			// TODO Ensure new structure makes this block dead code.
 			entity.removeComponent('waypoints');
 			return;
-		}
-
-		if(movementInProgress) {
+		} else if (inProgressWaypoint) {
 			return;
 		}
 
-		activeWaypoint = waypoints[0];
-		activeWaypoint.inProgress = true;
-		
-		var time = this.game.physics.arcade.distanceToXY(entity, activeWaypoint.x, activeWaypoint.y) * 1000 / entity.components.movable.speed;
+		inProgressWaypoint = queuedWaypoints.splice(0, 1)[0];
+		entity.components.waypoints.inProgress = inProgressWaypoint;
+		time = this.game.physics.arcade.distanceToXY(entity, inProgressWaypoint.x, inProgressWaypoint.y) * 1000 / entity.components.movable.speed;
 
-		activeWaypoint.rotationTween = this.game.add.tween(entity).to({
-			rotation: Phaser.Point.angle(activeWaypoint, entity.position),
+		inProgressWaypoint.rotationTween = this.game.add.tween(entity).to({
+			rotation: Phaser.Point.angle(inProgressWaypoint, entity.position),
 		}, 500);
-		activeWaypoint.moveTween = this.game.add.tween(entity.position).to(activeWaypoint, time);
-		activeWaypoint.moveTween
+
+		inProgressWaypoint.moveTween = this.game.add.tween(entity.position).to(inProgressWaypoint, time);
+
+		inProgressWaypoint.moveTween
 			.onComplete.add(function() {
 				this.marker.destroy();
 				this.moveTween.stop();
 				this.rotationTween.stop();
-				waypoint.inProgress = false;
-				waypoints.splice(0, 1);
-			}, activeWaypoint);
+				this.complete = true;
+			}, inProgressWaypoint);
 
-		activeWaypoint.moveTween.start();
-		activeWaypoint.rotationTween.start();
+		inProgressWaypoint.moveTween.start();
+		inProgressWaypoint.rotationTween.start();
 	},
 });

@@ -8399,7 +8399,6 @@ require('ecs/ecs').registerSystem('camera', {
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/camera.js","/src/systems")
 },{"_process":6,"buffer":3,"config":15,"ecs/ecs":12,"instance-manager":19,"lodash":7}],9:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
-var _ = require('lodash');
 var Phaser = require('phaser');
 
 require('ecs/ecs').registerSystem('movement', {
@@ -8416,17 +8415,18 @@ require('ecs/ecs').registerSystem('movement', {
 
 	runOne: function(entity) {
 		//TODO figure out better/more efficient waypoint structure
-		var activeWaypoint;
+		var inProgressWaypoint = entity.components.waypoints.inProgress;
+		var queuedWaypoints = entity.components.waypoints.queued;
 		var waypoint;
-		var movementInProgress = false;
-		var waypoints = entity.components.waypoints.points;
+		var time;
 
-		for(var i = 0; i < waypoints.length; i++) {
-			waypoint = waypoints[i];
+		if(inProgressWaypoint && inProgressWaypoint.complete) {
+			entity.components.waypoints.inProgress = null;
+			inProgressWaypoint = null;
+		}
 
-			if(waypoint.inProgress) {
-				movementInProgress = true;
-			}
+		for(var i = 0; i < queuedWaypoints.length; i++) {
+			waypoint = queuedWaypoints[i];
 
 			if(!waypoint.marker) {
 				waypoint.marker =  new Phaser.Sprite(this.game, waypoint.x, waypoint.y, 'waypointMarker');
@@ -8435,40 +8435,38 @@ require('ecs/ecs').registerSystem('movement', {
 			}
 		}
 
-		if(!waypoints.length) {
+		if(!inProgressWaypoint && !queuedWaypoints.length) {
 			// TODO Ensure new structure makes this block dead code.
 			entity.removeComponent('waypoints');
 			return;
-		}
-
-		if(movementInProgress) {
+		} else if (inProgressWaypoint) {
 			return;
 		}
 
-		activeWaypoint = waypoints[0];
-		activeWaypoint.inProgress = true;
-		
-		var time = this.game.physics.arcade.distanceToXY(entity, activeWaypoint.x, activeWaypoint.y) * 1000 / entity.components.movable.speed;
+		inProgressWaypoint = queuedWaypoints.splice(0, 1)[0];
+		entity.components.waypoints.inProgress = inProgressWaypoint;
+		time = this.game.physics.arcade.distanceToXY(entity, inProgressWaypoint.x, inProgressWaypoint.y) * 1000 / entity.components.movable.speed;
 
-		activeWaypoint.rotationTween = this.game.add.tween(entity).to({
-			rotation: Phaser.Point.angle(activeWaypoint, entity.position),
+		inProgressWaypoint.rotationTween = this.game.add.tween(entity).to({
+			rotation: Phaser.Point.angle(inProgressWaypoint, entity.position),
 		}, 500);
-		activeWaypoint.moveTween = this.game.add.tween(entity.position).to(activeWaypoint, time);
-		activeWaypoint.moveTween
+
+		inProgressWaypoint.moveTween = this.game.add.tween(entity.position).to(inProgressWaypoint, time);
+
+		inProgressWaypoint.moveTween
 			.onComplete.add(function() {
 				this.marker.destroy();
 				this.moveTween.stop();
 				this.rotationTween.stop();
-				waypoint.inProgress = false;
-				waypoints.splice(0, 1);
-			}, activeWaypoint);
+				this.complete = true;
+			}, inProgressWaypoint);
 
-		activeWaypoint.moveTween.start();
-		activeWaypoint.rotationTween.start();
+		inProgressWaypoint.moveTween.start();
+		inProgressWaypoint.rotationTween.start();
 	},
 });
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/movement.js","/src/systems")
-},{"_process":6,"buffer":3,"ecs/ecs":12,"instance-manager":19,"lodash":7,"phaser":13}],10:[function(require,module,exports){
+},{"_process":6,"buffer":3,"ecs/ecs":12,"instance-manager":19,"phaser":13}],10:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var _ = require('lodash');
 
@@ -8498,7 +8496,7 @@ require('ecs/ecs').registerSystem('ship-production', {
 			// TODO Figure out why rally point reference is being copied
 			// even though deep cloning
 			newShip.addComponent('waypoints', {
-				points: [_.cloneDeep(shipGenerator.rallyPoint)],
+				queued: [_.cloneDeep(shipGenerator.rallyPoint), _.cloneDeep(entity.position)],
 			});
 			
 			this.worldEntities.add(newShip);
