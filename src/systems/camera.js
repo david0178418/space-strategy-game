@@ -86,6 +86,7 @@ require('ecs/ecs').registerSystem('camera', {
 		this.worldEntities.position.y += localPosition.y * (this.worldEntities.scale.y - zoom);
 		this.worldEntities.scale.setTo(zoom);
 	},
+	
 	updateZoomTarget: function(delta) {
 		if(this.game.paused) {
 			return;

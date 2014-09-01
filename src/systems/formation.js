@@ -12,10 +12,13 @@ require('ecs/ecs').registerSystem('formation', {
 	run: function(entities) {
 		var avgX;
 		var avgY;
-		var groupMovementComponent = entities[0].components['group-movement'];
+		var colCount;
 		var entity;
+		var formationCenterOffsetX;
+		var formationCenterOffsetY;
 		var formationPositionX;
 		var formationPositionY;
+		var groupMovementComponent = entities[0].components['group-movement'];
 		var i;
 		var maxX = this.game.world.height * 10;
 		var maxY = this.game.world.width * 10;
@@ -48,6 +51,9 @@ require('ecs/ecs').registerSystem('formation', {
 		}
 		
 		rowCount = Math.sqrt(movableSelectedCount) | 0;
+		colCount = ((entities.length / rowCount) + 0.5) | 0;
+		formationCenterOffsetX = (slotWidth * (rowCount - 1)) / 2;
+		formationCenterOffsetY = (slotWidth * (colCount - 1)) / 2;
 
 		avgX = xTotal / movableSelectedCount;
 		avgY = yTotal / movableSelectedCount;
@@ -55,8 +61,8 @@ require('ecs/ecs').registerSystem('formation', {
 		for(i = 0; i < entities.length; i++) {
 			entity = entities[i];
 			
-			formationPositionX = groupMovementComponent.centralPoint.x + slotWidth * (i % rowCount);
-			formationPositionY = groupMovementComponent.centralPoint.y + slotWidth * ((i / rowCount)| 0);
+			formationPositionX = groupMovementComponent.centralPoint.x + slotWidth * (i % rowCount) - formationCenterOffsetX;
+			formationPositionY = groupMovementComponent.centralPoint.y + slotWidth * ((i / rowCount) | 0) - formationCenterOffsetY;
 
 			waypointsComponent = entity.components.waypoints;
 
@@ -78,9 +84,9 @@ require('ecs/ecs').registerSystem('formation', {
 						}
 					]
 				};
-
-				entity.removeComponent('group-movement');
 			}
+
+			entity.removeComponent('group-movement');
 		}
 	},
 	stopMovement: function(waypoint) {
