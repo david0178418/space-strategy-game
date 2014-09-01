@@ -20,6 +20,10 @@ _.extend(Entity.prototype, {
 	id: null,
 	components: null,
 	addComponent: function(component, props) {
+		if(this.components[component] && !props) {
+			return this;
+		}
+		
 		this.components[component] = this._ecs.createComponent(component, props);
 
 		return this;
@@ -28,12 +32,11 @@ _.extend(Entity.prototype, {
 		//TODO Cache this
 		return _.keys(this.components);
 	},
+	is: hasComponent,
 	getComponent: function(component) {
 		return this.components[component];
 	},
-	hasComponent: function(component) {
-		return _.contains(this.currentComponents(), component);
-	},
+	hasComponent: hasComponent,
 	hasComponents: function(components) {
 		return _.all(components, this.hasComponent, this);
 	},
@@ -41,5 +44,9 @@ _.extend(Entity.prototype, {
 		delete this.components[component];
 	},
 });
+
+function hasComponent(component) {
+	return _.contains(this.currentComponents(), component);
+}
 
 module.exports = Entity;

@@ -30,6 +30,8 @@ require('ecs/ecs').registerSystem('universe-creation', {
 				worldEntities.x = -newPlanet.x + CONFIG.screen.width / 2;
 				worldEntities.y = -newPlanet.y + CONFIG.screen.height / 2;
 
+				newPlanet.components.ownable.ownedBy = 'player';
+
 				newPlanet.addComponent('ship-generator', {
 					activeGenerator: 0,
 					generators: [

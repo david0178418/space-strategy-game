@@ -3,7 +3,7 @@
 var App = require('app');
 new App('#app');
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/main.js","/")
-},{"_process":6,"app":14,"buffer":3}],2:[function(require,module,exports){
+},{"_process":6,"app":17,"buffer":3}],2:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var _ = require('lodash');
 var instanceManager = require('instance-manager');
@@ -27,6 +27,10 @@ _.extend(Entity.prototype, {
 	id: null,
 	components: null,
 	addComponent: function(component, props) {
+		if(this.components[component] && !props) {
+			return this;
+		}
+		
 		this.components[component] = this._ecs.createComponent(component, props);
 
 		return this;
@@ -35,12 +39,11 @@ _.extend(Entity.prototype, {
 		//TODO Cache this
 		return _.keys(this.components);
 	},
+	is: hasComponent,
 	getComponent: function(component) {
 		return this.components[component];
 	},
-	hasComponent: function(component) {
-		return _.contains(this.currentComponents(), component);
-	},
+	hasComponent: hasComponent,
 	hasComponents: function(components) {
 		return _.all(components, this.hasComponent, this);
 	},
@@ -49,9 +52,13 @@ _.extend(Entity.prototype, {
 	},
 });
 
+function hasComponent(component) {
+	return _.contains(this.currentComponents(), component);
+}
+
 module.exports = Entity;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/libs/ecs/entity.js","/libs/ecs")
-},{"_process":6,"buffer":3,"ecs/ecs":12,"instance-manager":19,"lodash":7,"phaser":13}],3:[function(require,module,exports){
+},{"_process":6,"buffer":3,"ecs/ecs":15,"instance-manager":22,"lodash":7,"phaser":16}],3:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 /*!
  * The buffer module from node.js, for the browser.
@@ -8310,7 +8317,7 @@ require('ecs/ecs').registerSystem('camera', {
 		this.controls = instanceManager.get('controls');
 		this.world = this.game.world;
 		
-		this.background1layer1 = this.game.add.tileSprite(CONFIG.screen.width * -0.25, CONFIG.screen.width * -0.25, CONFIG.screen.width * 1.25, CONFIG.screen.width * 1.25, 'background1-layer1');
+		//this.background1layer1 = this.game.add.tileSprite(CONFIG.screen.width * -0.25, CONFIG.screen.width * -0.25, CONFIG.screen.width * 1.25, CONFIG.screen.width * 1.25, 'background1-layer1');
 		this.background1layer2 = this.game.add.tileSprite(CONFIG.screen.width * -0.5, CONFIG.screen.width * -0.5, CONFIG.screen.width * 1.5, CONFIG.screen.width * 1.5, 'background1-layer2');
 		this.worldEntities = instanceManager.get('worldEntities');
 
@@ -8381,8 +8388,8 @@ require('ecs/ecs').registerSystem('camera', {
 	},
 	
 	updateBackground: function() {
-		this.background1layer1.position.x = this.background1layer1.width * 0.005  * this.worldEntities.x / this.game.width;
-		this.background1layer1.position.y = this.background1layer1.height * 0.005 * this.worldEntities.y / this.game.height;
+		//this.background1layer1.position.x = this.background1layer1.width * 0.005  * this.worldEntities.x / this.game.width;
+		// /this.background1layer1.position.y = this.background1layer1.height * 0.005 * this.worldEntities.y / this.game.height;
 		this.background1layer2.position.x = this.background1layer2.width * 0.01 * this.worldEntities.x / this.game.width;
 		this.background1layer2.position.y = this.background1layer2.height * 0.01* this.worldEntities.y / this.game.height;
 	},
@@ -8397,7 +8404,210 @@ require('ecs/ecs').registerSystem('camera', {
 	},
 });
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/camera.js","/src/systems")
-},{"_process":6,"buffer":3,"config":15,"ecs/ecs":12,"instance-manager":19,"lodash":7}],9:[function(require,module,exports){
+},{"_process":6,"buffer":3,"config":18,"ecs/ecs":15,"instance-manager":22,"lodash":7}],9:[function(require,module,exports){
+(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
+var Phaser = require('phaser');
+var instanceManager = require('instance-manager');
+var game = instanceManager.get('game');
+
+require('ecs/ecs').registerSystem('drag-selection', {
+	controls: instanceManager.get('controls'),
+	endPoint: new Phaser.Point(),
+	game: game,
+	graphic: null,
+	mouse: game.input.mouse,
+	mousePointer: game.input.mousePointer,
+	registerRightClick: false,
+	selectedEntities: null,
+	startDrag: false,
+	startSelection: false,
+	worldEntities: instanceManager.get('worldEntities'),
+
+	components: [
+		'selectable',
+	],
+
+	init: function() {
+		this.graphic = this.game.add.graphics(-500, -500);
+		this.graphic.alpha = 0.25;
+		this.graphic.visible = false;
+	},
+
+	run: function(entities) {
+		var i;
+		var dragX;
+		var dragY;
+		var entity;
+		var entitiesLength;
+		var graphic;
+		var localPoint;
+		var selectableComponent;
+
+		if(this.mouse.button === 0) {
+			graphic = this.graphic;
+			dragX = this.mousePointer.worldX;
+			dragY = this.mousePointer.worldY;
+
+			if(!this.startSelection) {
+				this.startSelection = true;
+				graphic.visible = true;
+				graphic.position.set(dragX - 10, dragY - 10);
+				
+				// TODO: One pass at drawing upon selection start to
+				// get correct bounds before the graphics have been rendered
+				// DRY up at a later time.
+				graphic.clear();
+				graphic.lineStyle(3, 0xFFFF0B);
+				graphic.beginFill(0xFFFF0B);
+				graphic.drawRect(0, 0, dragX - graphic.position.x, dragY - graphic.position.y);
+				graphic.endFill();
+				return;
+			} else if(!this.startDrag && (
+					Math.abs(dragX - graphic.position.x) > 10 || Math.abs(dragY - graphic.position.y) > 10
+				)
+			) {
+				this.startDrag = true;
+			}
+
+			graphic.clear();
+			graphic.lineStyle(3, 0xFFFF0B);
+			graphic.beginFill(0xFFFF0B);
+			graphic.drawRect(0, 0, dragX - graphic.position.x, dragY - graphic.position.y);
+			graphic.endFill();
+
+			entitiesLength = entities.length;
+
+			for(i = 0; i < entitiesLength; i++) {
+				entity = entities[i];
+				selectableComponent = entity.components.selectable;
+
+				if(entity.components.ownable.ownedBy === 'player') {
+					if((this.startDrag || !selectableComponent.selected) && graphic.getBounds().intersects(entity.getBounds()) ) {
+						selectableComponent.selected = true;
+					} else if(selectableComponent.selected) {
+						selectableComponent.selected = false;
+					}
+				}
+			}
+		} else if(this.mouse.button === 2) {
+			this.registerRightClick = true;
+		} else if(this.registerRightClick) {
+			localPoint = this.game.input.getLocalPosition(this.worldEntities, this.game.input.mousePointer);
+
+			for(i = 0; i < entities.length; i++) {
+				entity = entities[i];
+
+				if(entity.components.movable && entity.components.ownable.ownedBy === 'player') {
+					entity.components['group-movement'] = { centralPoint: localPoint};
+				}
+			}
+
+			this.registerRightClick = false;
+		} else if(this.startSelection) {
+			this.startSelection = false;
+			this.startDrag = false;
+			this.graphic.visible = false;
+
+		}
+	},
+});
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/drag-selection.js","/src/systems")
+},{"_process":6,"buffer":3,"ecs/ecs":15,"instance-manager":22,"phaser":16}],10:[function(require,module,exports){
+(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
+require('ecs/ecs').registerSystem('formation', {
+	components: [
+		'group-movement',
+	],
+
+	init: function() {
+		var instanceManager = require('instance-manager');
+		this.game = instanceManager.get('game');
+		this.worldEntities = instanceManager.get('worldEntities');
+		this.controls = instanceManager.get('controls');
+	},
+
+	run: function(entities) {
+		var avgX;
+		var avgY;
+		var destination = entities[0].components['group-movement'].centralPoint;
+		var entity;
+		var i;
+		var maxX = this.game.world.height * 10;
+		var maxY = this.game.world.width * 10;
+		var minX = -1;
+		var minY = -1;
+		var movableSelectedCount = 0;
+		var rowCount;
+		var slotWidth = 80;
+		var waypointsComponent;
+		var xDiff;
+		var xTotal = 0;
+		var yDiff;
+		var yTotal = 0;
+
+		for(i = 0; i < entities.length; i++) {
+			entity = entities[i];
+			movableSelectedCount++;
+			xTotal += entity.x;
+			yTotal += entity.y;
+			
+			if(entity.x > maxX) {
+				maxX = entity.x;
+			} else if(entity.x < minX) {
+				minX = entity.x;
+			}
+			
+			if(entity.y > maxY) {
+				maxY = entity.y;
+			} else if(entity.y < minY) {
+				minY = entity.y;
+			}
+		}
+		
+		rowCount = Math.sqrt(movableSelectedCount) | 0;
+
+		avgX = xTotal / movableSelectedCount;
+		avgY = yTotal / movableSelectedCount;
+		
+		for(i = 0; i < entities.length; i++) {
+			entity = entities[i];
+			
+			xDiff = slotWidth * (i % rowCount);
+			yDiff = slotWidth * ((i / rowCount)| 0);
+
+			waypointsComponent = entity.components.waypoints;
+
+			if(this.controls.shiftModifier.isDown && waypointsComponent && waypointsComponent.inProgress) {
+				entity.components.waypoints.queued.push({
+					x: destination.x + xDiff,
+					y: destination.y + yDiff,
+				});
+			} else {
+				if(waypointsComponent && waypointsComponent.inProgress) {
+					this.stopMovement(waypointsComponent.inProgress);
+				}
+
+				entity.components.waypoints = {
+					queued: [
+						{
+							x: destination.x + xDiff,
+							y: destination.y + yDiff,
+						}
+					]
+				};
+
+				entity.removeComponent('group-movement');
+			}
+		}
+	},
+	stopMovement: function(waypoint) {
+		waypoint.marker.destroy();
+		waypoint.moveTween.stop();
+		waypoint.rotationTween.stop();
+	}
+});
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/formation.js","/src/systems")
+},{"_process":6,"buffer":3,"ecs/ecs":15,"instance-manager":22}],11:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var Phaser = require('phaser');
 
@@ -8466,7 +8676,41 @@ require('ecs/ecs').registerSystem('movement', {
 	},
 });
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/movement.js","/src/systems")
-},{"_process":6,"buffer":3,"ecs/ecs":12,"instance-manager":19,"phaser":13}],10:[function(require,module,exports){
+},{"_process":6,"buffer":3,"ecs/ecs":15,"instance-manager":22,"phaser":16}],12:[function(require,module,exports){
+(function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
+var Phaser = require('phaser');
+
+require('ecs/ecs').registerSystem('selection', {
+	components: [
+		'selectable',
+	],
+
+	init: function() {
+		var instanceManager = require('instance-manager');
+		this.game = instanceManager.get('game');
+		this.worldEntities = instanceManager.get('worldEntities');
+	},
+
+	runOne: function(entity) {
+		var selectableComponent = entity.components.selectable;
+
+		if(selectableComponent.selected) {
+			if(!selectableComponent.graphic) {
+				selectableComponent.graphic = new Phaser.Sprite(this.game, 0, 0, 'selection');
+				selectableComponent.graphic.anchor.setTo(0.5, 0.5);
+				entity.addChild(selectableComponent.graphic);
+			} else if(!selectableComponent.graphic.visible) {
+				selectableComponent.graphic.visible = true;
+			}
+		} else {
+			if(selectableComponent.graphic && selectableComponent.graphic.visible) {
+				selectableComponent.graphic.visible = false;
+			}
+		}
+	}
+});
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/selection.js","/src/systems")
+},{"_process":6,"buffer":3,"ecs/ecs":15,"instance-manager":22,"phaser":16}],13:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var _ = require('lodash');
 
@@ -8496,7 +8740,7 @@ require('ecs/ecs').registerSystem('ship-production', {
 			// TODO Figure out why rally point reference is being copied
 			// even though deep cloning
 			newShip.addComponent('waypoints', {
-				queued: [_.cloneDeep(shipGenerator.rallyPoint), _.cloneDeep(entity.position)],
+				queued: [_.cloneDeep(shipGenerator.rallyPoint)],
 			});
 			
 			this.worldEntities.add(newShip);
@@ -8504,7 +8748,7 @@ require('ecs/ecs').registerSystem('ship-production', {
 	},
 });
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/ship-production.js","/src/systems")
-},{"_process":6,"buffer":3,"ecs/ecs":12,"instance-manager":19,"lodash":7}],11:[function(require,module,exports){
+},{"_process":6,"buffer":3,"ecs/ecs":15,"instance-manager":22,"lodash":7}],14:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 require('ecs/ecs').registerSystem('universe-creation', {
 	init: function() {
@@ -8538,6 +8782,8 @@ require('ecs/ecs').registerSystem('universe-creation', {
 				worldEntities.x = -newPlanet.x + CONFIG.screen.width / 2;
 				worldEntities.y = -newPlanet.y + CONFIG.screen.height / 2;
 
+				newPlanet.components.ownable.ownedBy = 'player';
+
 				newPlanet.addComponent('ship-generator', {
 					activeGenerator: 0,
 					generators: [
@@ -8559,7 +8805,7 @@ require('ecs/ecs').registerSystem('universe-creation', {
 	},
 });
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/universe-creation.js","/src/systems")
-},{"_process":6,"buffer":3,"config":15,"ecs/ecs":12,"entities/fighter":17,"entities/planet":18,"instance-manager":19,"lodash":7}],12:[function(require,module,exports){
+},{"_process":6,"buffer":3,"config":18,"ecs/ecs":15,"entities/fighter":20,"entities/planet":21,"instance-manager":22,"lodash":7}],15:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var _ = require('lodash');
 var EntityBase = require('./entity');
@@ -8648,12 +8894,12 @@ module.exports = {
 	}
 };
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/libs/ecs/ecs.js","/libs/ecs")
-},{"./entity":2,"_process":6,"buffer":3,"lodash":7}],13:[function(require,module,exports){
+},{"./entity":2,"_process":6,"buffer":3,"lodash":7}],16:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 //TODO get rid of this hack
 module.exports = window.Phaser;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/libs/phaser.js","/libs")
-},{"_process":6,"buffer":3}],14:[function(require,module,exports){
+},{"_process":6,"buffer":3}],17:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var _ = require('lodash');
 var States = require('states');
@@ -8671,7 +8917,7 @@ module.exports = function() {
 	});
 };
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/app.js","/src")
-},{"_process":6,"buffer":3,"instance-manager":19,"lodash":7,"states":21,"states/play":22}],15:[function(require,module,exports){
+},{"_process":6,"buffer":3,"instance-manager":22,"lodash":7,"states":24,"states/play":25}],18:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 module.exports = {
 	screen: {
@@ -8684,7 +8930,7 @@ module.exports = {
 	}
 };
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/config.js","/src")
-},{"_process":6,"buffer":3}],16:[function(require,module,exports){
+},{"_process":6,"buffer":3}],19:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var _ = require('lodash');
 var Phaser = require('phaser');
@@ -8784,7 +9030,7 @@ Beam.create = function() {
 
 module.exports = Beam;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/entities/beam.js","/src/entities")
-},{"_process":6,"buffer":3,"instance-manager":19,"lodash":7,"phaser":13}],17:[function(require,module,exports){
+},{"_process":6,"buffer":3,"instance-manager":22,"lodash":7,"phaser":16}],20:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var ecs = require('ecs/ecs');
 
@@ -8797,7 +9043,7 @@ module.exports = function(x, y) {
 	});
 };
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/entities/fighter.js","/src/entities")
-},{"_process":6,"buffer":3,"ecs/ecs":12}],18:[function(require,module,exports){
+},{"_process":6,"buffer":3,"ecs/ecs":15}],21:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var ecs = require('ecs/ecs');
 
@@ -8813,7 +9059,7 @@ module.exports = function(x, y) {
 
 window.planet = module.exports;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/entities/planet.js","/src/entities")
-},{"_process":6,"buffer":3,"ecs/ecs":12}],19:[function(require,module,exports){
+},{"_process":6,"buffer":3,"ecs/ecs":15}],22:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 //Really, "Service Locator"...but whatever...  Using the
 //anti-pattern just to get this thing up.
@@ -8942,7 +9188,7 @@ instances = {};
 
 module.exports = instanceManager;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/instance-manager.js","/src")
-},{"_process":6,"buffer":3,"config":15,"interface/hud":20,"phaser":13}],20:[function(require,module,exports){
+},{"_process":6,"buffer":3,"config":18,"interface/hud":23,"phaser":16}],23:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 //TODO Need better place to organize since not really an entity.  Maybe "interface" folder?
 var instanceManager = require('instance-manager');
@@ -8981,11 +9227,11 @@ Hud.preload = function(game) {
 
 module.exports = Hud;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/interface/hud.js","/src/interface")
-},{"_process":6,"buffer":3,"instance-manager":19}],21:[function(require,module,exports){
+},{"_process":6,"buffer":3,"instance-manager":22}],24:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 module.exports = {};
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/states.js","/src")
-},{"_process":6,"buffer":3}],22:[function(require,module,exports){
+},{"_process":6,"buffer":3}],25:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 var CONFIG = require('config');
 var _ = require('lodash');
@@ -9039,16 +9285,17 @@ game.state.add(States.Play, {
 	},
 });
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/states/play.js","/src/states")
-},{"_process":6,"buffer":3,"config":15,"ecs/ecs":12,"entities/beam":16,"entities/planet":18,"instance-manager":19,"interface/hud":20,"lodash":7,"phaser":13,"states":21,"systems/registry":23}],23:[function(require,module,exports){
+},{"_process":6,"buffer":3,"config":18,"ecs/ecs":15,"entities/beam":19,"entities/planet":21,"instance-manager":22,"interface/hud":23,"lodash":7,"phaser":16,"states":24,"systems/registry":26}],26:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 require('./camera');
-// require('./drag-selection');
+require('./drag-selection');
+require('./formation');
 require('./movement');
-// require('./selection');
+require('./selection');
 require('./ship-production');
 require('./universe-creation');
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/registry.js","/src/systems")
-},{"./camera":8,"./movement":9,"./ship-production":10,"./universe-creation":11,"_process":6,"buffer":3}]},{},[1])
+},{"./camera":8,"./drag-selection":9,"./formation":10,"./movement":11,"./selection":12,"./ship-production":13,"./universe-creation":14,"_process":6,"buffer":3}]},{},[1])
 
 
 //# sourceMappingURL=bundle.js.map

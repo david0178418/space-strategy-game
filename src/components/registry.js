@@ -2,6 +2,7 @@
 //require('./gun');
 //require('./laser-gun');
 //require('./movement');
+require('./group-selected');
 require('./ownable');
 require('./selectable');
 require('./ship-generator');

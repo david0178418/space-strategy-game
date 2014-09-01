@@ -1,0 +1,1 @@
+require('ecs/ecs').registerComponent('group-selected');

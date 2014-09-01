@@ -1,42 +1,31 @@
+var Phaser = require('phaser');
 
+require('ecs/ecs').registerSystem('selection', {
+	components: [
+		'selectable',
+	],
 
-module.exports =  {
-	_selectionGraphic: null,
-	_radiusBuffer: 20,
-	isSelectable: true,
-	isSelected: false,
-
-	initComponentSelectable: function() {
-		this._selectionGraphic = new Phaser.Sprite(this.game, 0, 0, 'selection');
-		
-		this._selectionGraphic.anchor.setTo(0.5, 0.5);
-		
-
-		this._selectionGraphic.visible = false;
-		
-		//TODO Change to a child once real sprites are used
-		// due to scaling wierdness
-		this.addChild(this._selectionGraphic);
+	init: function() {
+		var instanceManager = require('instance-manager');
+		this.game = instanceManager.get('game');
+		this.worldEntities = instanceManager.get('worldEntities');
 	},
 
-	toggleSelection: function() {
-		if(this.isSelected) {
-			this.unselect();
+	runOne: function(entity) {
+		var selectableComponent = entity.components.selectable;
+
+		if(selectableComponent.selected) {
+			if(!selectableComponent.graphic) {
+				selectableComponent.graphic = new Phaser.Sprite(this.game, 0, 0, 'selection');
+				selectableComponent.graphic.anchor.setTo(0.5, 0.5);
+				entity.addChild(selectableComponent.graphic);
+			} else if(!selectableComponent.graphic.visible) {
+				selectableComponent.graphic.visible = true;
+			}
 		} else {
-			this.select();
+			if(selectableComponent.graphic && selectableComponent.graphic.visible) {
+				selectableComponent.graphic.visible = false;
+			}
 		}
-	},
-
-	select: function() {
-		this.isSelected = true;
-		this._selectionGraphic.visible = true;
-	},
-
-	deselect: function() {
-		this.isSelected = false;
-		this._selectionGraphic.visible = false;
-	},
-	
-	rightClickHandler: function() {
-	},
-};
+	}
+});
