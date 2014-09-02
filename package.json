@@ -15,7 +15,6 @@
   "license": "ISC",
   "devDependencies": {
     "browserify": "^5.11.0",
-    "exorcist": "^0.1.6",
     "gulp": "^3.8.7",
     "gulp-webserver": "^0.6.0",
     "vinyl-source-stream": "^0.1.1"
@@ -23,7 +22,6 @@
   "dependencies": {
     "jquery": "^2.1.1",
     "knockout": "^3.2.0",
-    "lodash": "^2.4.1",
-    "phaser": "git://github.com/photonstorm/phaser.git#v2.0.6"
+    "lodash": "^2.4.1"
   }
 }

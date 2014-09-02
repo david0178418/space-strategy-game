@@ -2,8 +2,6 @@ var CONFIG = require('config');
 var _ = require('lodash');
 var Phaser = require('phaser');
 var States = require('states');
-var Planet = require('entities/planet');
-var Beam = require('entities/beam');
 var Hud = require('interface/hud');
 var instanceManager = require('instance-manager');
 var game = instanceManager.get('game');
@@ -12,9 +10,6 @@ States.Play = 'play';
 game.state.add(States.Play, {
 	
 	preload: function(game) {
-		Hud.preload(game);
-		Beam.preload(game);
-		
 		game.load.image('battleship', 'assets/images/battleship.png');
 		game.load.image('fighter', 'assets/images/fighter.png');
 		game.load.image('planet', 'assets/images/planet.png');

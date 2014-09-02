@@ -11,5 +11,13 @@
 		<script src="libs/phaser/build/phaser.js"></script>
 		<!--TODO Figure out why phaser can't be built in like others-->
 		<script src="dist/js/bundle.js"></script>
+
+		<div id="ui">
+			<div class="production-options" data-bind="if: showProductionOptions, css: {active: showProductionOptions}">
+				<div class="options" data-bind="foreach: options">
+					<button class="icon-button" data-bind="text: label, click: clickHandler, disable: $parent.selectedOption() === index "></button>
+				</div>
+			</div>
+		</div>
 	</body>
 </html>

@@ -23,16 +23,20 @@ require('ecs/ecs').registerSystem('drag-selection', {
 		this.graphic = this.game.add.graphics(-500, -500);
 		this.graphic.alpha = 0.25;
 		this.graphic.visible = false;
+		this.uiViewModel = instanceManager.get('uiViewModel'); 
+		window.uiViewModel = this.uiViewModel;
 	},
 
 	run: function(entities) {
-		var i;
 		var dragX;
 		var dragY;
 		var entity;
 		var entitiesLength;
 		var graphic;
+		var i;
+		var noMovableEntities;
 		var selectableComponent;
+		var selectedEntites;
 
 		if(this.mouse.button === 0) {
 			graphic = this.graphic;
@@ -47,11 +51,7 @@ require('ecs/ecs').registerSystem('drag-selection', {
 				// TODO: One pass at drawing upon selection start to
 				// get correct bounds before the graphics have been rendered
 				// DRY up at a later time.
-				graphic.clear();
-				graphic.lineStyle(3, 0xFFFF0B);
-				graphic.beginFill(0xFFFF0B);
-				graphic.drawRect(0, 0, dragX - graphic.position.x, dragY - graphic.position.y);
-				graphic.endFill();
+				this.drawDragArea(dragX, dragY);
 				return;
 			} else if(!this.startDrag && (
 					Math.abs(dragX - graphic.position.x) > 10 || Math.abs(dragY - graphic.position.y) > 10
@@ -60,13 +60,11 @@ require('ecs/ecs').registerSystem('drag-selection', {
 				this.startDrag = true;
 			}
 
-			graphic.clear();
-			graphic.lineStyle(3, 0xFFFF0B);
-			graphic.beginFill(0xFFFF0B);
-			graphic.drawRect(0, 0, dragX - graphic.position.x, dragY - graphic.position.y);
-			graphic.endFill();
+			this.drawDragArea(dragX, dragY);
 
 			entitiesLength = entities.length;
+			noMovableEntities = true;
+			selectedEntites = [];
 
 			for(i = 0; i < entitiesLength; i++) {
 				entity = entities[i];
@@ -75,10 +73,24 @@ require('ecs/ecs').registerSystem('drag-selection', {
 				if(entity.components.ownable.ownedBy === 'player') {
 					if((this.startDrag || !selectableComponent.selected) && graphic.getBounds().intersects(entity.getBounds()) ) {
 						selectableComponent.selected = true;
+						selectedEntites.push(entity);
+
+						if(noMovableEntities && entity.components.movable) {
+							noMovableEntities = false;
+						}
 					} else if(selectableComponent.selected) {
 						selectableComponent.selected = false;
 					}
 				}
+			}
+
+			console.log(selectedEntites.length, noMovableEntities, this.uiViewModel.showProductionOptions());
+
+			if(selectedEntites.length && noMovableEntities && !this.uiViewModel.showProductionOptions()) {
+				this.createShipProductionOptions(selectedEntites);
+				this.uiViewModel.showProductionOptions(true);
+			} else if(!noMovableEntities && this.uiViewModel.showProductionOptions()) {
+				this.uiViewModel.showProductionOptions(false);
 			}
 		} else if(this.mouse.button === 2) {
 			this.registerRightClick = true;
@@ -93,6 +105,36 @@ require('ecs/ecs').registerSystem('drag-selection', {
 			this.graphic.visible = false;
 
 		}
+	},
+
+	//TODO This is all gross.  Rework is needed before moving on too far
+	createShipProductionOptions: function(entities) {
+		var productionOptions = [];
+		var shipGeneratorComponent = entities[0].components['ship-generator'];
+
+		this.uiViewModel.selectedOption(shipGeneratorComponent.activeGenerator);
+		_.each(shipGeneratorComponent.generators, function(generator, index) {
+			productionOptions.push({
+				index: index,
+				label: generator.label,
+				clickHandler: (function() {
+					shipGeneratorComponent.activeGenerator = index;
+
+					this.uiViewModel.selectedOption(index);
+				}).bind(this),
+			});
+		}, this);
+
+		this.uiViewModel.options(productionOptions);
+	},
+
+	drawDragArea: function(dragX, dragY) {
+		var graphic = this.graphic;
+		graphic.clear();
+		graphic.lineStyle(3, 0xFFFF0B);
+		graphic.beginFill(0xFFFF0B);
+		graphic.drawRect(0, 0, dragX - graphic.position.x, dragY - graphic.position.y);
+		graphic.endFill();
 	},
 
 	markClickLocation: function(point) {

@@ -1,11 +1,10 @@
 var browserify = require('browserify');
-var exorcist = require('exorcist');
 var gulp = require('gulp');
 var source = require('vinyl-source-stream');
 var webserver = require('gulp-webserver');
 
 gulp.task('watch', function() {
-	gulp.watch('./**/*.js', ['browserify']);
+	gulp.watch('./src/**/*.js', ['browserify']);
 });
 
 gulp.task('browserify', function(){
@@ -19,7 +18,6 @@ gulp.task('browserify', function(){
             ]
         })
         .bundle()
-        .pipe(exorcist('./dist/js/bundle.js.map'))
         .pipe(source('bundle.js'))
         .pipe(gulp.dest('./dist/js'));
 });

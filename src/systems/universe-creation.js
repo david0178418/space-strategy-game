@@ -37,10 +37,12 @@ require('ecs/ecs').registerSystem('universe-creation', {
 					//TODO figure out better way to hangle ship production details
 					generators: [
 						{
+							label: 'Fighter',
 							type: require('entities/fighter'),
-							buildTime: 6000,
+							buildTime: 3000,
 							currentUnitBuildTime: 0,
 						}, {
+							label: 'Battleship',
 							type: require('entities/battleship'),
 							buildTime: 10000,
 							currentUnitBuildTime: 0,

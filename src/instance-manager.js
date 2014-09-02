@@ -103,6 +103,20 @@ var resources = {
 			return new Hud();
 		},
 	},
+
+	uiViewModel: {
+		init: function() {
+			var ko = require('knockout');
+			var viewModel = {
+				options: ko.observableArray([]),
+				selectedOption: ko.observable(),
+				showProductionOptions: ko.observable(false),
+			};
+			
+			ko.applyBindings(viewModel);
+			return viewModel;
+		}
+	},
 		
 	controls: {
 		init: function() {
