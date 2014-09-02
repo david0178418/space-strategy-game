@@ -21,6 +21,7 @@
     "vinyl-source-stream": "^0.1.1"
   },
   "dependencies": {
+    "jquery": "^2.1.1",
     "knockout": "^3.2.0",
     "lodash": "^2.4.1",
     "phaser": "git://github.com/photonstorm/phaser.git#v2.0.6"
