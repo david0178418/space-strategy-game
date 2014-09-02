@@ -30,7 +30,7 @@ var resources = {
 			var Phaser = require('phaser');
 
 			//TODO remove debug global
-			window.game = new Phaser.Game(CONFIG.screen.width, CONFIG.screen.height, Phaser.AUTO, 'phaser');
+			window.game = new Phaser.Game(CONFIG.screen.width, CONFIG.screen.height, Phaser.AUTO, 'phaser', undefined, false);
 			return window.game;
 		},
 	},
