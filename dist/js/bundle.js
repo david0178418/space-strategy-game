@@ -8411,6 +8411,7 @@ require('ecs/ecs').registerSystem('camera', {
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/camera.js","/src/systems")
 },{"_process":6,"buffer":3,"config":18,"ecs/ecs":15,"instance-manager":23,"lodash":7}],9:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
+var _ = require('lodash');
 var Phaser = require('phaser');
 var instanceManager = require('instance-manager');
 var game = instanceManager.get('game');
@@ -8444,7 +8445,6 @@ require('ecs/ecs').registerSystem('drag-selection', {
 		var entity;
 		var entitiesLength;
 		var graphic;
-		var localPoint;
 		var selectableComponent;
 
 		if(this.mouse.button === 0) {
@@ -8496,22 +8496,10 @@ require('ecs/ecs').registerSystem('drag-selection', {
 		} else if(this.mouse.button === 2) {
 			this.registerRightClick = true;
 		} else if(this.registerRightClick) {
-			localPoint = this.game.input.getLocalPosition(this.worldEntities, this.game.input.mousePointer);
+			this.processSelectedEntitiesRightClick(_.filter(entities, function(entity) {
+				return entity.getComponent('selectable').selected;
+			}));
 
-			for(i = 0; i < entities.length; i++) {
-				entity = entities[i];
-				selectableComponent = entity.components.selectable;
-
-				if(entity.components.movable && selectableComponent.selected && entity.components.ownable.ownedBy === 'player') {
-					entity.components['group-movement'] = {
-						override: this.controls.shiftModifier.isDown,
-						centralPoint: localPoint,
-					};
-				}
-			}
-
-			this.registerRightClick = false;
-			this.markClickLocation(localPoint);
 		} else if(this.startSelection) {
 			this.startSelection = false;
 			this.startDrag = false;
@@ -8542,9 +8530,36 @@ require('ecs/ecs').registerSystem('drag-selection', {
 		}, markerAnimationTime).start();
 		markerTween.start();
 	},
+
+	processSelectedEntitiesRightClick: function(entities) {
+		var entity;
+		var i;
+		var localPoint;
+		var noMovable = !_.find(entities, function(entity) {
+			return entity.hasComponent('movable');
+		});
+
+		localPoint = this.game.input.getLocalPosition(this.worldEntities, this.game.input.mousePointer);
+
+		for(i = 0; i < entities.length; i++) {
+			entity = entities[i];
+
+			if(noMovable && entity.hasComponent('ship-generator')) {
+				entity.getComponent('ship-generator').rallyPoint = localPoint;
+			} else if(entity.components.movable && entity.components.ownable.ownedBy === 'player') {
+				entity.components['group-movement'] = {
+					override: this.controls.shiftModifier.isDown,
+					centralPoint: localPoint,
+				};
+			}
+		}
+
+		this.registerRightClick = false;
+		this.markClickLocation(localPoint);
+	},
 });
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/src/systems/drag-selection.js","/src/systems")
-},{"_process":6,"buffer":3,"ecs/ecs":15,"instance-manager":23,"phaser":16}],10:[function(require,module,exports){
+},{"_process":6,"buffer":3,"ecs/ecs":15,"instance-manager":23,"lodash":7,"phaser":16}],10:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 require('ecs/ecs').registerSystem('formation', {
 	components: [
@@ -8823,7 +8838,7 @@ require('ecs/ecs').registerSystem('universe-creation', {
 							currentUnitBuildTime: 0,
 						}, {
 							type: require('entities/battleship'),
-							buildTime: 1000,
+							buildTime: 10000,
 							currentUnitBuildTime: 0,
 						}
 					],
@@ -8867,7 +8882,7 @@ module.exports = {
 			return props;
 		}
 
-		return _.merge({}, props, component);
+		return _.merge({}, component, props);
 	},
 
 	destroyEntity: function(entity) {

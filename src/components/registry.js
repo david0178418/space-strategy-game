@@ -1,7 +1,3 @@
-//require('./damage');
-//require('./gun');
-//require('./laser-gun');
-//require('./movement');
 require('./buildable');
 require('./group-selected');
 require('./group-selected');
@@ -9,4 +5,4 @@ require('./movable');
 require('./ownable');
 require('./selectable');
 require('./ship-generator');
-//require('./target-closest');
+require('./waypoints');

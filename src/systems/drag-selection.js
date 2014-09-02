@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var Phaser = require('phaser');
 var instanceManager = require('instance-manager');
 var game = instanceManager.get('game');
@@ -31,7 +32,6 @@ require('ecs/ecs').registerSystem('drag-selection', {
 		var entity;
 		var entitiesLength;
 		var graphic;
-		var localPoint;
 		var selectableComponent;
 
 		if(this.mouse.button === 0) {
@@ -83,22 +83,10 @@ require('ecs/ecs').registerSystem('drag-selection', {
 		} else if(this.mouse.button === 2) {
 			this.registerRightClick = true;
 		} else if(this.registerRightClick) {
-			localPoint = this.game.input.getLocalPosition(this.worldEntities, this.game.input.mousePointer);
+			this.processSelectedEntitiesRightClick(_.filter(entities, function(entity) {
+				return entity.getComponent('selectable').selected;
+			}));
 
-			for(i = 0; i < entities.length; i++) {
-				entity = entities[i];
-				selectableComponent = entity.components.selectable;
-
-				if(entity.components.movable && selectableComponent.selected && entity.components.ownable.ownedBy === 'player') {
-					entity.components['group-movement'] = {
-						override: this.controls.shiftModifier.isDown,
-						centralPoint: localPoint,
-					};
-				}
-			}
-
-			this.registerRightClick = false;
-			this.markClickLocation(localPoint);
 		} else if(this.startSelection) {
 			this.startSelection = false;
 			this.startDrag = false;
@@ -128,5 +116,32 @@ require('ecs/ecs').registerSystem('drag-selection', {
 			alpha: 0,
 		}, markerAnimationTime).start();
 		markerTween.start();
+	},
+
+	processSelectedEntitiesRightClick: function(entities) {
+		var entity;
+		var i;
+		var localPoint;
+		var noMovable = !_.find(entities, function(entity) {
+			return entity.hasComponent('movable');
+		});
+
+		localPoint = this.game.input.getLocalPosition(this.worldEntities, this.game.input.mousePointer);
+
+		for(i = 0; i < entities.length; i++) {
+			entity = entities[i];
+
+			if(noMovable && entity.hasComponent('ship-generator')) {
+				entity.getComponent('ship-generator').rallyPoint = localPoint;
+			} else if(entity.components.movable && entity.components.ownable.ownedBy === 'player') {
+				entity.components['group-movement'] = {
+					override: this.controls.shiftModifier.isDown,
+					centralPoint: localPoint,
+				};
+			}
+		}
+
+		this.registerRightClick = false;
+		this.markClickLocation(localPoint);
 	},
 });

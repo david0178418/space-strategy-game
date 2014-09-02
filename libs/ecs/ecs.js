@@ -24,7 +24,7 @@ module.exports = {
 			return props;
 		}
 
-		return _.merge({}, props, component);
+		return _.merge({}, component, props);
 	},
 
 	destroyEntity: function(entity) {
