@@ -2,6 +2,7 @@
 //require('./gun');
 //require('./laser-gun');
 //require('./movement');
+require('./buildable');
 require('./group-selected');
 require('./group-selected');
 require('./movable');

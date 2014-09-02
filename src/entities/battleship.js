@@ -1,10 +1,10 @@
 var ecs = require('ecs/ecs');
 
 module.exports = function(x, y) {
-	return ecs.createEntity(x, y, 'fighter')
+	return ecs.createEntity(x, y, 'battleship')
 	.addComponent('ownable')
 	.addComponent('selectable')
 	.addComponent('movable', {
-		speed: 100,
+		speed: 50,
 	});
 };

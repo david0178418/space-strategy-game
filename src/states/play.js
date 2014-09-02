@@ -15,10 +15,8 @@ game.state.add(States.Play, {
 		Hud.preload(game);
 		Beam.preload(game);
 		
-		game.load.atlas('ships', 'assets/images/ships-spritesheet.png', 'assets/images/ships-atlas.json');
-		game.load.atlas('planets', 'assets/images/planets-spritesheet.png', 'assets/images/planets-atlas.json');
-		
-		game.load.image('ship', 'assets/images/ship.png');
+		game.load.image('battleship', 'assets/images/battleship.png');
+		game.load.image('fighter', 'assets/images/fighter.png');
 		game.load.image('planet', 'assets/images/planet.png');
 
 		game.load.image('selection', '/assets/images/selection.png', 50, 50);

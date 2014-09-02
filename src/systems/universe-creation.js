@@ -33,11 +33,16 @@ require('ecs/ecs').registerSystem('universe-creation', {
 				newPlanet.components.ownable.ownedBy = 'player';
 
 				newPlanet.addComponent('ship-generator', {
-					activeGenerator: 0,
+					activeGenerator: 1,
+					//TODO figure out better way to hangle ship production details
 					generators: [
 						{
 							type: require('entities/fighter'),
 							buildTime: 6000,
+							currentUnitBuildTime: 0,
+						}, {
+							type: require('entities/battleship'),
+							buildTime: 10000,
 							currentUnitBuildTime: 0,
 						}
 					],
