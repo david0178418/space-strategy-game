@@ -30,7 +30,7 @@ require('ecs/ecs').registerSystem('universe-creation', {
 				worldEntities.x = -newPlanet.x + CONFIG.screen.width / 2;
 				worldEntities.y = -newPlanet.y + CONFIG.screen.height / 2;
 
-				newPlanet.components.ownable.ownedBy = 'player';
+				newPlanet.components.team.name = 'player';
 
 				newPlanet.addComponent('ship-generator', {
 					activeGenerator: 1,
@@ -45,6 +45,11 @@ require('ecs/ecs').registerSystem('universe-creation', {
 							label: 'Battleship',
 							type: require('entities/battleship'),
 							buildTime: 10000,
+							currentUnitBuildTime: 0,
+						}, {
+							label: 'Colony Ship',
+							type: require('entities/colony-ship'),
+							buildTime: 15000,
 							currentUnitBuildTime: 0,
 						}
 					],

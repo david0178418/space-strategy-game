@@ -21,7 +21,7 @@ require('ecs/ecs').registerSystem('ship-production', {
 		if(activeGenerator.currentUnitBuildTime >= activeGenerator.buildTime) {
 			activeGenerator.currentUnitBuildTime = 0;
 			newShip = activeGenerator.type(entity.x, entity.y);
-			newShip.components.ownable.ownedBy = entity.components.ownable.ownedBy;
+			newShip.components.team.name = entity.components.team.name;
 			
 			// TODO Figure out why rally point reference is being copied
 			// even though deep cloning

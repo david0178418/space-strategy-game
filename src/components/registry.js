@@ -2,7 +2,7 @@ require('./buildable');
 require('./group-selected');
 require('./group-selected');
 require('./movable');
-require('./ownable');
+require('./team');
 require('./selectable');
 require('./ship-generator');
 require('./waypoints');

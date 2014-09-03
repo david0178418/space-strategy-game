@@ -7,6 +7,7 @@ require('ecs/ecs').registerSystem('formation', {
 		var instanceManager = require('instance-manager');
 		this.game = instanceManager.get('game');
 		this.worldEntities = instanceManager.get('worldEntities');
+		this.moveOrderSound = game.add.audio('move-order');
 	},
 
 	run: function(entities) {
@@ -87,6 +88,10 @@ require('ecs/ecs').registerSystem('formation', {
 			}
 
 			entity.removeComponent('group-movement');
+		}
+		
+		if(!this.moveOrderSound.isPlaying) {
+			this.moveOrderSound.play();
 		}
 	},
 	stopMovement: function(waypoint) {

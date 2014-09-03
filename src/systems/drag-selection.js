@@ -70,7 +70,7 @@ require('ecs/ecs').registerSystem('drag-selection', {
 				entity = entities[i];
 				selectableComponent = entity.components.selectable;
 
-				if(entity.components.ownable.ownedBy === 'player') {
+				if(entity.components.team.name === 'player') {
 					if((this.startDrag || !selectableComponent.selected) && graphic.getBounds().intersects(entity.getBounds()) ) {
 						selectableComponent.selected = true;
 						selectedEntites.push(entity);
@@ -83,8 +83,6 @@ require('ecs/ecs').registerSystem('drag-selection', {
 					}
 				}
 			}
-
-			console.log(selectedEntites.length, noMovableEntities, this.uiViewModel.showProductionOptions());
 
 			if(selectedEntites.length && noMovableEntities && !this.uiViewModel.showProductionOptions()) {
 				this.createShipProductionOptions(selectedEntites);
@@ -175,7 +173,7 @@ require('ecs/ecs').registerSystem('drag-selection', {
 
 			if(noMovable && entity.hasComponent('ship-generator')) {
 				entity.getComponent('ship-generator').rallyPoint = localPoint;
-			} else if(entity.components.movable && entity.components.ownable.ownedBy === 'player') {
+			} else if(entity.components.movable && entity.components.team.name === 'player') {
 				entity.components['group-movement'] = {
 					override: this.controls.shiftModifier.isDown,
 					centralPoint: localPoint,

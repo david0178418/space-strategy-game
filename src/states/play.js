@@ -11,6 +11,7 @@ game.state.add(States.Play, {
 	
 	preload: function(game) {
 		game.load.image('battleship', 'assets/images/battleship.png');
+		game.load.image('colony-ship', 'assets/images/colony-ship.png');
 		game.load.image('fighter', 'assets/images/fighter.png');
 		game.load.image('planet', 'assets/images/planet.png');
 
@@ -19,6 +20,9 @@ game.state.add(States.Play, {
 		
 		game.load.image('background1-layer1', '/assets/images/backdrop-black-little-spark-black.png', 512, 512);
 		game.load.image('background1-layer2', '/assets/images/backdrop-black-little-spark-transparent.png', 512, 512);
+
+		game.load.audio( 'move-order', '/assets/audio/move-order.ogg');
+		game.load.audio( 'lasting-hope', '/assets/audio/bgm-lasting-hope.mp3');
 	},
 	
 	create: function(game) {
@@ -32,6 +36,10 @@ game.state.add(States.Play, {
 		require('systems/registry');
 
 		this.ecs.runSystemInits();
+
+		var bgm = game.add.audio('lasting-hope');
+		bgm.loop = true;
+		bgm.play();
 	},
 	update: function() {
 		
