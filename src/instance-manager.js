@@ -24,6 +24,47 @@ var instanceManager = {
 };
 	
 var resources = {
+		
+	beams: {
+		init: function() {
+			return instanceManager.get('group');
+		},
+	},
+
+	controls: {
+		init: function() {
+			var Phaser = require('phaser'),
+				KeyCodes = Phaser.Keyboard,
+				game = instanceManager.get('game'),
+				keyboard = game.input.keyboard;
+			return {
+				panUp: keyboard.addKey(KeyCodes.W),
+				panRight: keyboard.addKey(KeyCodes.D),
+				panDown: keyboard.addKey(KeyCodes.S),
+				panLeft: keyboard.addKey(KeyCodes.A),
+				shiftModifier: keyboard.addKey(KeyCodes.SHIFT),
+			};
+		}
+	},
+
+	//TODO less ghetto way of collecting all targetables
+	// since entities can only exist in one group at a time
+	enemyTargets: {
+		init: function() {
+			return {
+				_lists: [
+				],
+				forEachAlive: function(callback, context) {
+					//TODO less ghetto way of collecting all targetables
+					// since entities can only exist in one group at a time
+					for(var x = 0; x < this._lists.length; x++) {
+						this._lists[x].forEachAlive(callback, context);
+					}
+				}
+			};
+		}
+	},
+	
 	game: {
 		init: function() {
 			var CONFIG = require('config');
@@ -42,15 +83,13 @@ var resources = {
 		}
 	},
 	
-	worldEntities: {
+	hud: {
 		init: function() {
-			//TODO: Remove global debug
-			var worldEntities = window.worldEntities = instanceManager.get('group');
-			
-			return worldEntities;
-		}	
+			var Hud = require('interface/hud');
+			return new Hud();
+		},
 	},
-	
+
 	//TODO less ghetto way of collecting all targetables
 	// since entities can only exist in one group at a time
 	playerTargets: {
@@ -67,40 +106,9 @@ var resources = {
 		},
 	},
 	
-	//TODO less ghetto way of collecting all targetables
-	// since entities can only exist in one group at a time
-	enemyTargets: {
-		init: function() {
-			return {
-				_lists: [
-				],
-				forEachAlive: function(callback, context) {
-					//TODO less ghetto way of collecting all targetables
-					// since entities can only exist in one group at a time
-					for(var x = 0; x < this._lists.length; x++) {
-						this._lists[x].forEachAlive(callback, context);
-					}
-				}
-			};
-		}
-	},
-		
 	ships: {
 		init: function() {
 			return instanceManager.get('group');
-		},
-	},
-		
-	beams: {
-		init: function() {
-			return instanceManager.get('group');
-		},
-	},
-	
-	hud: {
-		init: function() {
-			var Hud = require('interface/hud');
-			return new Hud();
 		},
 	},
 
@@ -117,21 +125,14 @@ var resources = {
 			return viewModel;
 		}
 	},
-		
-	controls: {
+	
+	worldEntities: {
 		init: function() {
-			var Phaser = require('phaser'),
-				KeyCodes = Phaser.Keyboard,
-				game = instanceManager.get('game'),
-				keyboard = game.input.keyboard;
-			return {
-				panUp: keyboard.addKey(KeyCodes.W),
-				panRight: keyboard.addKey(KeyCodes.D),
-				panDown: keyboard.addKey(KeyCodes.S),
-				panLeft: keyboard.addKey(KeyCodes.A),
-				shiftModifier: keyboard.addKey(KeyCodes.SHIFT),
-			};
-		}
+			//TODO: Remove global debug
+			var worldEntities = window.worldEntities = instanceManager.get('group');
+			
+			return worldEntities;
+		}	
 	},
 };
 
