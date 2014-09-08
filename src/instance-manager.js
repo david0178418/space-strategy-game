@@ -2,6 +2,8 @@
 //anti-pattern just to get this thing up.
 //TODO Organize more neatly so dependecies are known by the interface
 //TODO remove debug global
+var instances = {};
+
 var instanceManager = {
 	get: function(resourceName) {
 		var resourceInstance = instances[resourceName];
@@ -20,8 +22,6 @@ var instanceManager = {
 		instances[dependency] = resources[dependency]();
 	}
 };
-
-window.instanceManager = instanceManager;
 	
 var resources = {
 	game: {
@@ -132,9 +132,10 @@ var resources = {
 				shiftModifier: keyboard.addKey(KeyCodes.SHIFT),
 			};
 		}
-	}
-},
-	
-instances = {};
+	},
+};
 
 module.exports = instanceManager;
+
+// TODO remove debug
+window.instanceManager = instanceManager;

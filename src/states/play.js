@@ -3,6 +3,7 @@ var _ = require('lodash');
 var Phaser = require('phaser');
 var States = require('states');
 var Hud = require('interface/hud');
+var mouseControl = require('interface/mouse-control');
 var instanceManager = require('instance-manager');
 var game = instanceManager.get('game');
 
@@ -40,10 +41,12 @@ game.state.add(States.Play, {
 		var bgm = game.add.audio('lasting-hope');
 		bgm.loop = true;
 		bgm.play();
+
+		mouseControl.init();
 	},
 	update: function() {
 		
-
+		mouseControl.update();
 		this.ecs.runSystems();
 	},
 	

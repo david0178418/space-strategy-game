@@ -3,9 +3,11 @@ var instanceManager = require('instance-manager');
 var Phaser = require('phaser');
 
 function Entity(x, y, graphic) {
-	this.id = _.uniqueId('entity-');
-	this.components = {};
+
 	this._ecs = require('ecs/ecs');
+	this.components = {};
+	this.id = _.uniqueId('entity-');
+	this.entityType = graphic;
 
 	var game = instanceManager.get('game');
 	
@@ -16,9 +18,13 @@ function Entity(x, y, graphic) {
 
 Entity.prototype = Object.create(Phaser.Sprite.prototype);
 _.extend(Entity.prototype, {
+	_ecs: null,
+
+	components: null,
 	constructor: Entity,
 	id: null,
-	components: null,
+	entityType: '',
+
 	addComponent: function(component, props) {
 		if(this.components[component] && !props) {
 			return this;
@@ -38,6 +44,7 @@ _.extend(Entity.prototype, {
 	},
 	hasComponent: hasComponent,
 	hasComponents: function(components) {
+		components = _.isArray(components) ? components: [components];
 		return _.all(components, this.hasComponent, this);
 	},
 	removeComponent: function(component) {

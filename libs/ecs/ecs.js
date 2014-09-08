@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var EntityBase = require('./entity');
 
-module.exports = {
+var ECS_DEBUG = {
 	_entities: [],
 	_initSystems: {},
 	_runSystems: {},
@@ -84,3 +84,7 @@ module.exports = {
 		}, this);
 	}
 };
+
+window.ecs = ECS_DEBUG;
+
+module.exports = ECS_DEBUG;

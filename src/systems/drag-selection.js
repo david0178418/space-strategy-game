@@ -15,15 +15,20 @@ require('ecs/ecs').registerSystem('drag-selection', {
 	startSelection: false,
 	worldEntities: instanceManager.get('worldEntities'),
 
+	mouseHold: false,
+	mouseClick: false,
+
 	components: [
 		'selectable',
 	],
 
 	init: function() {
+		game.input.holdRate = 250;
 		this.graphic = this.game.add.graphics(-500, -500);
 		this.graphic.alpha = 0.25;
 		this.graphic.visible = false;
-		this.uiViewModel = instanceManager.get('uiViewModel'); 
+		this.uiViewModel = instanceManager.get('uiViewModel');
+
 		window.uiViewModel = this.uiViewModel;
 	},
 
@@ -115,11 +120,11 @@ require('ecs/ecs').registerSystem('drag-selection', {
 			productionOptions.push({
 				index: index,
 				label: generator.label,
-				clickHandler: (function() {
+				clickHandler: function() {
 					shipGeneratorComponent.activeGenerator = index;
 
 					this.uiViewModel.selectedOption(index);
-				}).bind(this),
+				}.bind(this),
 			});
 		}, this);
 
