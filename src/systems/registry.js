@@ -1,5 +1,4 @@
 require('./camera');
-//require('./drag-selection');
 require('./interpret-orders');
 require('./formation');
 require('./menu-buttons');
