@@ -14,7 +14,7 @@ require('ecs/ecs').registerSystem('ship-production', {
 	runOne: function(entity) {
 		var newShip;
 		var shipGenerator = entity.getComponent('ship-generator');
-		var activeGenerator = shipGenerator.generators[shipGenerator.activeGenerator];
+		var activeGenerator = shipGenerator.options[shipGenerator.activeGenerator];
 
 		activeGenerator.currentUnitBuildTime += this.game.time.elapsed;
 		

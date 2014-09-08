@@ -116,6 +116,7 @@ var resources = {
 		init: function() {
 			var ko = require('knockout');
 			var viewModel = {
+				component: ko.observable(''),
 				options: ko.observableArray([]),
 				selectedOption: ko.observable(),
 				showProductionOptions: ko.observable(false),

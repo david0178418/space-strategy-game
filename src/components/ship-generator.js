@@ -1,6 +1,6 @@
 require('ecs/ecs').registerComponent('ship-generator', {
 	activeGenerator: null,
-	generators: null,
+	options: null,
 	rallyPoint: null,
 	shipTypes: null,
 });

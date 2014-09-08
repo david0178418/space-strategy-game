@@ -2,6 +2,7 @@ require('./camera');
 //require('./drag-selection');
 require('./interpret-orders');
 require('./formation');
+require('./menu-buttons');
 require('./movement');
 require('./selection');
 require('./ship-production');

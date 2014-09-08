@@ -35,7 +35,7 @@ require('ecs/ecs').registerSystem('universe-creation', {
 				newPlanet.addComponent('ship-generator', {
 					activeGenerator: 1,
 					//TODO figure out better way to hangle ship production details
-					generators: [
+					options: [
 						{
 							label: 'Fighter',
 							type: require('entities/fighter'),
@@ -44,12 +44,12 @@ require('ecs/ecs').registerSystem('universe-creation', {
 						}, {
 							label: 'Battleship',
 							type: require('entities/battleship'),
-							buildTime: 10000,
+							buildTime: 5000,
 							currentUnitBuildTime: 0,
 						}, {
 							label: 'Colony Ship',
 							type: require('entities/colony-ship'),
-							buildTime: 15000,
+							buildTime: 7000,
 							currentUnitBuildTime: 0,
 						}
 					],

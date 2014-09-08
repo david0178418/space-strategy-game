@@ -116,7 +116,7 @@ require('ecs/ecs').registerSystem('drag-selection', {
 		var shipGeneratorComponent = entities[0].components['ship-generator'];
 
 		this.uiViewModel.selectedOption(shipGeneratorComponent.activeGenerator);
-		_.each(shipGeneratorComponent.generators, function(generator, index) {
+		_.each(shipGeneratorComponent.options, function(generator, index) {
 			productionOptions.push({
 				index: index,
 				label: generator.label,
