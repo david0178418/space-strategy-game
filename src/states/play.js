@@ -1,8 +1,6 @@
 var CONFIG = require('config');
-var _ = require('lodash');
 var Phaser = require('phaser');
 var States = require('states');
-var Hud = require('interface/hud');
 var mouseControl = require('interface/mouse-control');
 var instanceManager = require('instance-manager');
 var game = instanceManager.get('game');
@@ -34,6 +32,7 @@ game.state.add(States.Play, {
 		
 		this.ecs = require('ecs/ecs');
 
+		require('components/registry');
 		require('systems/registry');
 
 		this.ecs.runSystemInits();

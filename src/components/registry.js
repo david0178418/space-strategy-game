@@ -1,5 +1,3 @@
-require('./buildable');
-require('./group-selected');
 require('./group-selected');
 require('./movable');
 require('./team');
