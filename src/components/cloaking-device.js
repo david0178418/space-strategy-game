@@ -1,5 +1,4 @@
-require('ecs/ecs').registerComponent('movable', {
-	speed: 0,
+require('ecs/ecs').registerComponent('cloaking-device', {
 	options: [
 		{
 			label: 'Cloak',

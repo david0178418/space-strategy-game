@@ -6,6 +6,6 @@ module.exports = function(x, y) {
 	.addComponent('selectable')
 	.addComponent('cloaking-device')
 	.addComponent('movable', {
-		speed: 100,
+		speed: 150,
 	});
 };

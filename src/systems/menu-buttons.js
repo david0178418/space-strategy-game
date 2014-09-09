@@ -11,7 +11,7 @@ require('ecs/ecs').registerSystem('menu', {
 
 	run: function(entities) {
 		//TODO Clean up this mess for generating menu options
-		var commonOptions = this.getMenuOptions(entities);
+		var commonOptions;
 
 		_.find(entities, function(entity) {
 			var entityOptions = this.getMenuOptions(entity);
@@ -19,7 +19,11 @@ require('ecs/ecs').registerSystem('menu', {
 			if(!commonOptions) {
 				commonOptions = entityOptions;
 			} else {
-				commonOptions = _.union(commonOptions, entityOptions);
+				commonOptions = _.filter(commonOptions, function(commonOption) {
+						return _.find(entityOptions, function(entityOption) {
+							return entityOption.label === commonOption.label;
+						});
+					});
 			}
 
 			return !commonOptions.length;
