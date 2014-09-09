@@ -1,5 +1,5 @@
 require('./camera');
-require('./interpret-orders');
+require('./orders-interpretation');
 require('./formation');
 require('./menu-buttons');
 require('./movement');

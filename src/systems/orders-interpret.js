@@ -2,7 +2,7 @@ var _ = require('lodash');
 var instanceManager = require('instance-manager');
 var game = instanceManager.get('game');
 
-require('ecs/ecs').registerSystem('interpret-orders', {
+require('ecs/ecs').registerSystem('orders-interpret', {
 
 	components: [
 		'issue-order',
