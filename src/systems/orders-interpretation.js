@@ -2,23 +2,19 @@ var _ = require('lodash');
 var instanceManager = require('instance-manager');
 var game = instanceManager.get('game');
 
-require('ecs/ecs').registerSystem('orders-interpret', {
+require('ecs/ecs').registerSystem('orders-interpretation', {
 
 	components: [
 		'issue-order',
 	],
 
 	run: function(entities) {
-		var entity;
-		var i;
 		var localPoint = game.input.getLocalPosition(instanceManager.get('worldEntities'), game.input.mousePointer);
 		var noMovable = !_.find(entities, function(entity) {
 			return entity.hasComponent('movable');
 		});
 
-		for(i = 0; i < entities.length; i++) {
-			entity = entities[i];
-
+		_.each(entities, function(entity) {
 			if(noMovable && entity.hasComponent('ship-generator')) {
 				entity.getComponent('ship-generator').rallyPoint = localPoint;
 			} else if(entity.components.movable && entity.components.team.name === 'player') {
@@ -29,6 +25,6 @@ require('ecs/ecs').registerSystem('orders-interpret', {
 			}
 
 			entity.removeComponent('issue-order');
-		}
+		});
 	},
 });

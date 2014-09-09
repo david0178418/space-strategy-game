@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var Phaser = require('phaser');
 
 require('ecs/ecs').registerSystem('movement', {
@@ -27,6 +28,8 @@ require('ecs/ecs').registerSystem('movement', {
 		for(var i = 0; i < queuedWaypoints.length; i++) {
 			waypoint = queuedWaypoints[i];
 		}
+
+		//waypoint = _.last(queuedWaypoints);
 
 		if(!inProgressWaypoint && !queuedWaypoints.length) {
 			// TODO Ensure new structure makes this block dead code.

@@ -1,3 +1,5 @@
+var _ = require('lodash');
+
 require('ecs/ecs').registerSystem('formation', {
 	components: [
 		'group-movement',
@@ -7,20 +9,18 @@ require('ecs/ecs').registerSystem('formation', {
 		var instanceManager = require('instance-manager');
 		this.game = instanceManager.get('game');
 		this.worldEntities = instanceManager.get('worldEntities');
-		this.moveOrderSound = game.add.audio('move-order');
+		this.moveOrderSound = this.game.add.audio('move-order');
 	},
 
 	run: function(entities) {
 		var avgX;
 		var avgY;
 		var colCount;
-		var entity;
 		var formationCenterOffsetX;
 		var formationCenterOffsetY;
 		var formationPositionX;
 		var formationPositionY;
 		var groupMovementComponent = entities[0].components['group-movement'];
-		var i;
 		var maxX = this.game.world.height * 10;
 		var maxY = this.game.world.width * 10;
 		var minX = -1;
@@ -32,8 +32,7 @@ require('ecs/ecs').registerSystem('formation', {
 		var xTotal = 0;
 		var yTotal = 0;
 
-		for(i = 0; i < entities.length; i++) {
-			entity = entities[i];
+		_.each(entities, function(entity) {
 			movableSelectedCount++;
 			xTotal += entity.x;
 			yTotal += entity.y;
@@ -49,7 +48,7 @@ require('ecs/ecs').registerSystem('formation', {
 			} else if(entity.y < minY) {
 				minY = entity.y;
 			}
-		}
+		}, this);
 		
 		rowCount = Math.sqrt(movableSelectedCount) | 0;
 		colCount = ((entities.length / rowCount) + 0.5) | 0;
@@ -59,9 +58,7 @@ require('ecs/ecs').registerSystem('formation', {
 		avgX = xTotal / movableSelectedCount;
 		avgY = yTotal / movableSelectedCount;
 		
-		for(i = 0; i < entities.length; i++) {
-			entity = entities[i];
-			
+		_.each(entities, function(entity, i) {
 			formationPositionX = groupMovementComponent.centralPoint.x + slotWidth * (i % rowCount) - formationCenterOffsetX;
 			formationPositionY = groupMovementComponent.centralPoint.y + slotWidth * ((i / rowCount) | 0) - formationCenterOffsetY;
 
@@ -88,7 +85,7 @@ require('ecs/ecs').registerSystem('formation', {
 			}
 
 			entity.removeComponent('group-movement');
-		}
+		}, this);
 		
 		if(!this.moveOrderSound.isPlaying) {
 			this.moveOrderSound.play();

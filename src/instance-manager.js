@@ -46,24 +46,6 @@ var resources = {
 			};
 		}
 	},
-
-	//TODO less ghetto way of collecting all targetables
-	// since entities can only exist in one group at a time
-	enemyTargets: {
-		init: function() {
-			return {
-				_lists: [
-				],
-				forEachAlive: function(callback, context) {
-					//TODO less ghetto way of collecting all targetables
-					// since entities can only exist in one group at a time
-					for(var x = 0; x < this._lists.length; x++) {
-						this._lists[x].forEachAlive(callback, context);
-					}
-				}
-			};
-		}
-	},
 	
 	game: {
 		init: function() {
@@ -87,22 +69,6 @@ var resources = {
 		init: function() {
 			var Hud = require('interface/hud');
 			return new Hud();
-		},
-	},
-
-	//TODO less ghetto way of collecting all targetables
-	// since entities can only exist in one group at a time
-	playerTargets: {
-		init: function() {
-			return {
-				_lists: [
-				],
-				forEachAlive: function(callback, context) {
-					for(var x = 0; x < this._lists.length; x++) {
-						this._lists[x].forEachAlive(callback, context);
-					}
-				},
-			};
 		},
 	},
 	
