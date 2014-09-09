@@ -91,16 +91,16 @@ module.exports = {
 
 		_.each(this.ecs.getEntities('selectable'), function(entity) {
 			var intersects;
-			var selectableComponent = entity.components.selectable;
+			var isSelected = entity.components.selected;
 
 			if(entity.components.team.name === 'player') {
 				intersects = graphic.getBounds().intersects(entity.getBounds());
 
-				if(!selectableComponent.selected && intersects) {
-					selectableComponent.selected = true;
+				if(!isSelected && intersects) {
+					entity.addComponent('selected');
 					selectedEntites.push(entity);
-				} else if(selectableComponent.selected && !intersects) {
-					selectableComponent.selected = false;
+				} else if(isSelected && !intersects) {
+					entity.removeComponent('selected');
 				}
 			}
 		});
@@ -144,9 +144,9 @@ module.exports = {
 				selectedEntityTeam === team &&
 				entity.inCamera
 			) { 
-				entity.components.selectable.selected =  true;
+				entity.addComponent('selected');
 			} else {
-				entity.components.selectable.selected = false;
+				entity.removeComponent('selected');
 			}
 		});
 	},
@@ -156,7 +156,7 @@ module.exports = {
 		var selectedEntity = this.getTopEntityAt(entities, x, y);
 
 		_.each(entities, function(entity) {
-			entity.components.selectable.selected = entity === selectedEntity;
+			entity.toggleComponent('selected', entity === selectedEntity);
 		});
 	},
 
@@ -190,7 +190,7 @@ module.exports = {
 		var entities = this.ecs.getEntities('selectable');
 		
 		_.each(entities, function(entity) {
-			if(entity.components.selectable.selected) {
+			if(entity.is('selected')) {
 				entity.addComponent('issue-order', {
 					x: x,
 					y: y,

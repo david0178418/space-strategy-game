@@ -6,23 +6,14 @@ require('ecs/ecs').registerSystem('menu', {
 	uiViewModel: instanceManager.get('uiViewModel'),
 
 	components: [
-		'selectable',
+		'selected',
 	],
 
 	run: function(entities) {
 		//TODO Clean up this mess for generating menu options
-		var commonOptions;
-		var selectedEntites = _.filter(entities, function(entity) {
-			return entity.components.selectable.selected;
-		});
+		var commonOptions = this.getMenuOptions(entities);
 
-		if(!selectedEntites.length) {
-			return;
-		}
-
-		commonOptions = this.getMenuOptions(selectedEntites);
-
-		_.find(selectedEntites, function(entity) {
+		_.find(entities, function(entity) {
 			var entityOptions = this.getMenuOptions(entity);
 
 			if(!commonOptions) {

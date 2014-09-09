@@ -2,6 +2,10 @@ var _ = require('lodash');
 var instanceManager = require('instance-manager');
 var Phaser = require('phaser');
 
+function hasComponent(component) {
+	return _.contains(this.currentComponents(), component);
+}
+
 function Entity(x, y, graphic) {
 
 	this._ecs = require('ecs/ecs');
@@ -50,10 +54,12 @@ _.extend(Entity.prototype, {
 	removeComponent: function(component) {
 		delete this.components[component];
 	},
-});
+	toggleComponent: function(component, value, props) {
+		/*jshint -W030 */
+		var removeComponent = _.isUndefined(value) ? !!this.components[component] : value;
 
-function hasComponent(component) {
-	return _.contains(this.currentComponents(), component);
-}
+		removeComponent ? this.removeComponent(component) : this.addComponent(component, props);
+	}
+});
 
 module.exports = Entity;

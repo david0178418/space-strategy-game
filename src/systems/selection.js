@@ -14,7 +14,7 @@ require('ecs/ecs').registerSystem('selection', {
 	runOne: function(entity) {
 		var selectableComponent = entity.components.selectable;
 
-		if(selectableComponent.selected) {
+		if(entity.is('selected')) {
 			if(!selectableComponent.graphic) {
 				selectableComponent.graphic = new Phaser.Sprite(this.game, 0, 0, 'selection');
 				selectableComponent.graphic.anchor.setTo(0.5, 0.5);
