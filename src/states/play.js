@@ -38,9 +38,9 @@ game.state.add(States.Play, {
 
 		this.ecs.runSystemInits();
 
-		var bgm = game.add.audio('lasting-hope');
-		bgm.loop = true;
-		bgm.play();
+		this.bgm = game.add.audio('lasting-hope');
+		this.bgm.loop = true;
+		this.bgm.play();
 
 		mouseControl.init();
 	},
