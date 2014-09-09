@@ -1,4 +1,5 @@
 module.exports = {
+	universe_size: 15,
 	screen: {
 		width: 1280,
 		height: 720,

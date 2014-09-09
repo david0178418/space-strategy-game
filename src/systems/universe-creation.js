@@ -19,7 +19,7 @@ require('ecs/ecs').registerSystem('universe-creation', {
 		worldEntities.add(planet(CONFIG.stage.width, 0));
 		worldEntities.add(planet(CONFIG.stage.width, CONFIG.stage.height));
 		
-		for(i = 0; i < 15; i++) {
+		for(i = 0; i < CONFIG.universe_size; i++) {
 			newPlanet = planet(
 				_.random(100, CONFIG.stage.width - 100),
 				_.random(100, CONFIG.stage.height - 100)
@@ -33,10 +33,15 @@ require('ecs/ecs').registerSystem('universe-creation', {
 				newPlanet.components.team.name = 'player';
 
 				newPlanet.addComponent('ship-generator', {
-					activeGenerator: 1,
+					activeGenerator: 0,
 					//TODO figure out better way to hangle ship production details
 					options: [
 						{
+							label: 'Probe',
+							type: require('entities/probe'),
+							buildTime: 5000,
+							currentUnitBuildTime: 0,
+						},{
 							label: 'Fighter',
 							type: require('entities/fighter'),
 							buildTime: 3000,
@@ -51,7 +56,7 @@ require('ecs/ecs').registerSystem('universe-creation', {
 							type: require('entities/colony-ship'),
 							buildTime: 7000,
 							currentUnitBuildTime: 0,
-						}
+						},
 					],
 					rallyPoint: {
 						x: newPlanet.x + 100,

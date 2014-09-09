@@ -1,3 +1,4 @@
+require('./cloaking-device');
 require('./group-selected');
 require('./movable');
 require('./team');

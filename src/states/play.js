@@ -13,6 +13,7 @@ game.state.add(States.Play, {
 		game.load.image('colony-ship', 'assets/images/colony-ship.png');
 		game.load.image('fighter', 'assets/images/fighter.png');
 		game.load.image('planet', 'assets/images/planet.png');
+		game.load.image('probe', 'assets/images/probe.png');
 
 		game.load.image('selection', '/assets/images/selection.png', 50, 50);
 		game.load.image('waypointMarker', '/assets/images/waypoint.png', 20, 20);

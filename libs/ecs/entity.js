@@ -54,11 +54,11 @@ _.extend(Entity.prototype, {
 	removeComponent: function(component) {
 		delete this.components[component];
 	},
-	toggleComponent: function(component, value, props) {
+	toggleComponent: function(component, addComponent, props) {
 		/*jshint -W030 */
-		var removeComponent = _.isUndefined(value) ? !!this.components[component] : value;
+		addComponent = _.isUndefined(addComponent) ? !this.components[component] : addComponent;
 
-		removeComponent ? this.removeComponent(component) : this.addComponent(component, props);
+		addComponent ? this.addComponent(component, props): this.removeComponent(component);
 	}
 });
 
