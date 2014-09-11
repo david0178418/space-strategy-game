@@ -89,6 +89,8 @@ var resources = {
 			};
 			
 			ko.applyBindings(viewModel);
+			//TODO: Remove global debug;
+			window.viewModel = viewModel;
 			return viewModel;
 		}
 	},
