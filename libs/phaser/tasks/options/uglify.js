@@ -40,6 +40,22 @@ module.exports = {
         dest: '<%= compile_dir %>/phaser-arcade-physics.min.js'
     },
 
+    phaserNinjaPhysics: {
+        options: {
+            banner: '/* Phaser (NJ) v<%= package.version %> - http://phaser.io - @photonstorm - (c) 2014 Photon Storm Ltd. */\n'
+        },
+        src: ['<%= concat.phaserNinjaPhysics.dest %>'],
+        dest: '<%= compile_dir %>/phaser-ninja-physics.min.js'
+    },
+
+    phaserNoPhysics: {
+        options: {
+            banner: '/* Phaser (NP) v<%= package.version %> - http://phaser.io - @photonstorm - (c) 2014 Photon Storm Ltd. */\n'
+        },
+        src: ['<%= concat.phaserNoPhysics.dest %>'],
+        dest: '<%= compile_dir %>/phaser-no-physics.min.js'
+    },
+
     standalone: {
         options: {
             sourceMap: true,

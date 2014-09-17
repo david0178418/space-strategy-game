@@ -43,6 +43,7 @@ game.state.add(States.Play, {
 		this.bgm.play();
 
 		mouseControl.init();
+		this.game.physics.startSystem(Phaser.Physics.ARCADE);
 	},
 	update: function() {
 		

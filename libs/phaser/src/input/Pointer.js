@@ -218,6 +218,12 @@ Phaser.Pointer = function (game, id) {
     this.active = false;
 
     /**
+    * @property {boolean} dirty - A dirty pointer needs to re-poll any interactive objects it may have been over, regardless if it has moved or not.
+    * @default
+    */
+    this.dirty = false;
+
+    /**
     * @property {Phaser.Point} position - A Phaser.Point object containing the current x/y values of the pointer on the display.
     */
     this.position = new Phaser.Point();
@@ -273,6 +279,7 @@ Phaser.Pointer.prototype = {
         this.withinGame = true;
         this.isDown = true;
         this.isUp = false;
+        this.dirty = false;
 
         //  Work out how long it has been since the last click
         this.msSinceLastClick = this.game.time.now - this.timeDown;
@@ -319,6 +326,17 @@ Phaser.Pointer.prototype = {
 
         if (this.active)
         {
+            //  Force a check?
+            if (this.dirty)
+            {
+                if (this.game.input.interactiveItems.total > 0)
+                {
+                    this.processInteractiveObjects(true);
+                }
+
+                this.dirty = false;
+            }
+
             if (this._holdSent === false && this.duration >= this.game.input.holdRate)
             {
                 if (this.game.input.multiInputOverride == Phaser.Input.MOUSE_OVERRIDES_TOUCH || this.game.input.multiInputOverride == Phaser.Input.MOUSE_TOUCH_COMBINE || (this.game.input.multiInputOverride == Phaser.Input.TOUCH_OVERRIDES_MOUSE && this.game.input.currentPointers === 0))
@@ -387,8 +405,8 @@ Phaser.Pointer.prototype = {
             this.movementY += this.rawMovementY;
         }
 
-        this.x = (this.pageX - this.game.stage.offset.x) * this.game.input.scale.x;
-        this.y = (this.pageY - this.game.stage.offset.y) * this.game.input.scale.y;
+        this.x = (this.pageX - this.game.scale.offset.x) * this.game.input.scale.x;
+        this.y = (this.pageY - this.game.scale.offset.y) * this.game.input.scale.y;
 
         this.position.setTo(this.x, this.y);
         this.circle.x = this.x;
@@ -412,17 +430,11 @@ Phaser.Pointer.prototype = {
             return this;
         }
 
-        //  DEPRECATED - Soon to be removed
-        if (this.game.input.moveCallback)
-        {
-            this.game.input.moveCallback.call(this.game.input.moveCallbackContext, this, this.x, this.y);
-        }
-
         var i = this.game.input.moveCallbacks.length;
 
         while (i--)
         {
-            this.game.input.moveCallbacks[i].callback.call(this.game.input.moveCallbacks[i].context, this, this.x, this.y);
+            this.game.input.moveCallbacks[i].callback.call(this.game.input.moveCallbacks[i].context, this, this.x, this.y, fromClick);
         }
 
         //  Easy out if we're dragging something and it still exists
@@ -432,8 +444,6 @@ Phaser.Pointer.prototype = {
             {
                 this.targetObject = null;
             }
-
-            return this;
         }
         else if (this.game.input.interactiveItems.total > 0)
         {
@@ -450,6 +460,7 @@ Phaser.Pointer.prototype = {
     * @method Phaser.Pointer#processInteractiveObjects
     * @protected
     * @param {boolean} [fromClick=false] - Was this called from the click event?
+    * @return {boolean} True if this method processes an object (i.e. a Sprite becomes the Pointers currentTarget), otherwise false.
     */
     processInteractiveObjects: function (fromClick) {
 
@@ -504,7 +515,6 @@ Phaser.Pointer.prototype = {
         while (currentNode !== null);
 
         //  Now we know the top-most item (if any) we can process it
-
         if (this._highestRenderObject === null)
         {
             //  The pointer isn't currently over anything, check if we've got a lingering previous target
@@ -544,6 +554,8 @@ Phaser.Pointer.prototype = {
                 }
             }
         }
+
+        return (this.targetObject !== null);
 
     },
 
@@ -671,6 +683,7 @@ Phaser.Pointer.prototype = {
 
         this.pointerId = null;
         this.identifier = null;
+        this.dirty = false;
         this.isDown = false;
         this.isUp = true;
         this.totalTouches = 0;

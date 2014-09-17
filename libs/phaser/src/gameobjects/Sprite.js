@@ -378,6 +378,7 @@ Phaser.Sprite.prototype.loadTexture = function (key, frame, stopAnimation) {
     }
     else if (key instanceof Phaser.BitmapData)
     {
+        //  This works from a reference, which probably isn't what we need here
         this.setTexture(key.texture);
     }
     else if (key instanceof PIXI.Texture)
@@ -643,6 +644,11 @@ Phaser.Sprite.prototype.destroy = function(destroyChildren) {
     if (typeof destroyChildren === 'undefined') { destroyChildren = true; }
 
     this._cache[8] = 1;
+
+    if (this.events)
+    {
+        this.events.onDestroy.dispatch(this);
+    }
 
     if (this.parent)
     {

@@ -23,6 +23,8 @@
     "src/core/Stage.js",
     "src/core/Group.js",
     "src/core/World.js",
+    "src/core/FlexGrid.js",
+    "src/core/FlexLayer.js",
     "src/core/ScaleManager.js",
     "src/core/Game.js",
 
@@ -45,6 +47,7 @@
     "src/gameobjects/Sprite.js",
     "src/gameobjects/Image.js",
     "src/gameobjects/TileSprite.js",
+    "src/gameobjects/Rope.js",
     "src/gameobjects/Text.js",
     "src/gameobjects/BitmapText.js",
     "src/gameobjects/Button.js",

@@ -34,10 +34,10 @@ Capital: Shol Arbela
 Cities: Jakanda, Tifan's Well
 POI: River Mora
 
-Cairhien
+Cairhien *
 
 Capital: Cairhien
-Cities: Eianrod, Jurene, Maerone, Morelle, Selean, Taien, Tremonsien
+Cities: Eianrod *, Jurene, Maerone, Morelle, Selean, Taien, Tremonsien
 
 Ghealdan *
 
