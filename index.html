@@ -15,7 +15,10 @@
 		<div id="ui">
 			<div class="production-options" data-bind="if: showProductionOptions, css: {active: showProductionOptions}">
 				<div class="options" data-bind="foreach: options">
-					<button class="icon-button" data-bind="text: label"></button>
+					<button class="icon-button"
+						data-bind="text: label,
+							click: $parent[handler+'Handler']"
+					></button>
 				</div>
 			</div>
 		</div>

@@ -34,24 +34,29 @@ require('ecs/ecs').registerSystem('universe-creation', {
 
 				newPlanet.addComponent('ship-generator', {
 					activeGenerator: 0,
-					//TODO figure out better way to hangle ship production details
+					//TODO figure out better way to handle ship production details
+					// and button interactions
 					options: [
 						{
+							handler: 'changeProduction',
 							label: 'Probe',
 							type: require('entities/probe'),
 							buildTime: 5000,
 							currentUnitBuildTime: 0,
 						},{
+							handler: 'changeProduction',
 							label: 'Fighter',
 							type: require('entities/fighter'),
 							buildTime: 3000,
 							currentUnitBuildTime: 0,
 						}, {
+							handler: 'changeProduction',
 							label: 'Battleship',
 							type: require('entities/battleship'),
 							buildTime: 5000,
 							currentUnitBuildTime: 0,
 						}, {
+							handler: 'changeProduction',
 							label: 'Colony Ship',
 							type: require('entities/colony-ship'),
 							buildTime: 7000,

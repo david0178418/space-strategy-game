@@ -81,12 +81,7 @@ var resources = {
 	uiViewModel: {
 		init: function() {
 			var ko = require('knockout');
-			var viewModel = {
-				component: ko.observable(''),
-				options: ko.observableArray([]),
-				selectedOption: ko.observable(),
-				showProductionOptions: ko.observable(false),
-			};
+			var viewModel = require('interface/ui-view-model');
 			
 			ko.applyBindings(viewModel);
 			//TODO: Remove global debug;

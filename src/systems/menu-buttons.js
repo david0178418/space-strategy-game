@@ -38,7 +38,6 @@ require('ecs/ecs').registerSystem('menu', {
 
 		this.uiViewModel.options(commonOptions);
 
-
 		if(!this.uiViewModel.showProductionOptions()) {
 			this.uiViewModel.showProductionOptions(true);
 		}

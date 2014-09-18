@@ -1,4 +1,6 @@
 require('./camera');
+require('./cloaking-system');
+require('./decloaking-system');
 require('./orders-interpretation');
 require('./formation');
 require('./menu-buttons');

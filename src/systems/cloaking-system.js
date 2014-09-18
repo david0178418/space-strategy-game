@@ -3,10 +3,11 @@ var _ = require('lodash');
 require('ecs/ecs').registerSystem('cloaking-device', {
 	components: [
 		'cloaking-device',
-		'selected',
+		'cloaking',
 	],
 
-	run: function() {
-
+	runOne: function(entity) {
+		entity.alpha = 0.3;
+		entity.removeComponent('cloaking');
 	},
 });
