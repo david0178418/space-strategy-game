@@ -22,9 +22,9 @@ module.exports = {
 			'selected',
 			'cloaking-device',
 		]);
-
+ 
 		_.invoke(entities, 'addComponent', 'decloaking');
-	},
+	},  
 
 	// TODO Gross and brittle way to handle ship production
 	changeProductionHandler: function(clickedOption) {
@@ -41,5 +41,5 @@ module.exports = {
 
 			generatorComponent.activeGenerator = generatorIndex;
 		});
-	}
+	},
 };
