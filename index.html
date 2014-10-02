@@ -13,11 +13,11 @@
 		<script src="dist/js/bundle.js"></script>
 
 		<div id="ui">
-			<div class="production-options" data-bind="if: showProductionOptions, css: {active: showProductionOptions}">
+			<div class="production-options" data-bind="if: showMenu, css: {active: showMenu}">
 				<div class="options" data-bind="foreach: options">
 					<button class="icon-button"
 						data-bind="text: label,
-							click: $parent[handler+'Handler']"
+							click: handler"
 					></button>
 				</div>
 			</div>

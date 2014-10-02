@@ -14,7 +14,7 @@ function Entity(x, y, graphic) {
 	this.entityType = graphic;
 
 	var game = instanceManager.get('game');
-	
+
 	Phaser.Sprite.call(this, game, x, y, graphic);
 	this.anchor.setTo(0.5, 0.5);
 	this.autoCull = true;
@@ -33,7 +33,7 @@ _.extend(Entity.prototype, {
 		if(this.components[component] && !props) {
 			return this;
 		}
-		
+
 		this.components[component] = this._ecs.createComponent(component, props);
 
 		return this;

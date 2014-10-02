@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var Phaser = require('phaser');
 
 require('ecs/ecs').registerSystem('selection', {
@@ -12,9 +13,20 @@ require('ecs/ecs').registerSystem('selection', {
 		var instanceManager = require('instance-manager');
 		this.game = instanceManager.get('game');
 		this.worldEntities = instanceManager.get('worldEntities');
+		this.uiViewModel = instanceManager.get('uiViewModel');
+		this.selectionChanged = false;
 	},
 
-	runOne: function(entity) {
+	run: function(entities) {
+		_.each(entities, this.checkSelection, this);
+
+		if(this.selectionChanged) {
+			this.uiViewModel.update();
+			this.selectionChanged = false;
+		}
+	},
+
+	checkSelection: function(entity) {
 		var selectableComponent = entity.components.selectable;
 		var graphic;
 
@@ -28,16 +40,17 @@ require('ecs/ecs').registerSystem('selection', {
 					+ this.SELECTION_PADDING;
 				this.worldEntities.addChild(graphic);
 				selectableComponent.graphic = graphic;
+				this.selectionChanged = true;
 			} else if(!selectableComponent.graphic.visible) {
 				selectableComponent.graphic.visible = true;
+				this.selectionChanged = true;
 			}
-			
+
 			selectableComponent.graphic.position.x = entity.position.x;
 			selectableComponent.graphic.position.y = entity.position.y;
-		} else {
-			if(selectableComponent.graphic && selectableComponent.graphic.visible) {
-				selectableComponent.graphic.visible = false;
-			}
+		} else if(selectableComponent.graphic && selectableComponent.graphic.visible) {
+			this.selectionChanged = true;
+			selectableComponent.graphic.visible = false;
 		}
 	}
 });
