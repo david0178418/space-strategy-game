@@ -25,11 +25,14 @@ game.state.add(States.Play, {
 	},
 
 	create: function(game) {
-		game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-		game.scale.setScreenSize();
+		game.scale.setShowAll();
 
+		window.addEventListener('click', function(e) {
+			game.scale.startFullScreen(false);
+			game.scale.refresh();
+		});
 		game.world.setBounds(0, 0, CONFIG.stage.width, CONFIG.stage.height);
-
+		game.scale.refresh();
 		this.ecs = require('ecs/ecs');
 
 		require('components/registry');
