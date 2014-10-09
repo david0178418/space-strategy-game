@@ -176,6 +176,19 @@ Phaser.GameObjectFactory.prototype = {
     sound: function (key, volume, loop, connect) {
 
         return this.game.sound.add(key, volume, loop, connect);
+    
+    },
+
+    /**
+     * Creates a new AudioSprite object.
+     *
+     * @method Phaser.GameObjectFactory#audioSprite
+     * @param {string} key - The Game.cache key of the sound that this object will use.
+     * @return {Phaser.AudioSprite} The newly created AudioSprite object.
+     */
+    audioSprite: function (key) {
+
+        return this.game.sound.addSprite(key);
 
     },
 

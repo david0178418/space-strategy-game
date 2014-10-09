@@ -1,11 +1,22 @@
 <?php
+
+    $src = "loader/Cache.js";
+    $method = null;
+    $property = null;
+
     if (isset($_GET['src']))
     {
-        $srcfile = $_GET['src'];
+        $src = $_GET['src'];
     }
-    else
+
+    if (isset($_GET['method']))
     {
-        $srcfile = "loader/Cache";
+        $method = $_GET['method'];
+    }
+
+    if (isset($_GET['property']))
+    {
+        $property = $_GET['property'];
     }
 
     require 'src/Block.php';
@@ -17,13 +28,13 @@
     require 'src/ReturnType.php';
     require 'src/Processor.php';
 
-    $data = new Processor("../src/" . $srcfile . ".js");
+    $data = new Processor(null, "../src/$src");
 ?>
 <!doctype html>
 <html>
     <head>
         <meta charset="UTF-8" />
-        <title>Phaser Documentation Viewer: <?php echo $srcfile ?></title>
+        <title>Phaser Documentation Viewer: <?php echo $src ?></title>
         <style type="text/css">
             body {
                 font-family: Arial;
@@ -40,15 +51,40 @@
     </head>
     <body>
 
-    <h1><?php echo $srcfile ?></h1>
+    <a href="index.php">Index</a>
+
+    <h1><?php echo $src ?></h1>
+
+<?php
+    echo "<pre>";
+    print_r($data->getLog());
+    echo "</pre>";
+
+    echo "<pre>";
+    print_r($data->class->getArray());
+    echo "</pre>";
+
+    if ($method)
+    {
+        echo "<pre>";
+        print_r($data->methods[$method]->getArray());
+        echo "</pre>";
+    }
+
+    if ($property)
+    {
+        echo "<pre>";
+        print_r($data->properties[$property]->getArray());
+        echo "</pre>";
+    }
+?>
 
     <h2>Constants</h2>
 
     <ul>
 <?php
-    for ($i = 0; $i < count($data->consts); $i++)
+    foreach ($data->consts as $constName => $const)
     {
-       $const = $data->consts[$i];
        echo "<li>{$const->name}</li>";
     }
 ?>
@@ -56,27 +92,78 @@
 
     <h2>Methods</h2>
 
+    <h3>Public</h3>
     <ul>
 <?php
-    for ($i = 0; $i < count($data->methods); $i++)
+    foreach ($data->methods['public'] as $methodName => $method)
     {
-        $method = $data->methods[$i];
-        echo "<li>{$method->name}</li>";
+        echo "<li><a href=\"view.php?src=$src&amp;method={$method->name}\">{$method->name}</a></li>";
+    }
+?>
+    </ul>
+
+    <h3>Protected</h3>
+    <ul>
+<?php
+    foreach ($data->methods['protected'] as $methodName => $method)
+    {
+        echo "<li><a href=\"view.php?src=$src&amp;method={$method->name}\">{$method->name}</a></li>";
+    }
+?>
+    </ul>
+
+    <h3>Private</h3>
+    <ul>
+<?php
+    foreach ($data->methods['private'] as $methodName => $method)
+    {
+        echo "<li><a href=\"view.php?src=$src&amp;method={$method->name}\">{$method->name}</a></li>";
+    }
+?>
+    </ul>
+
+    <h3>Static</h3>
+    <ul>
+<?php
+    foreach ($data->methods['static'] as $methodName => $method)
+    {
+        echo "<li><a href=\"view.php?src=$src&amp;method={$method->name}\">{$method->name}</a></li>";
     }
 ?>
     </ul>
 
     <h2>Properties</h2>
 
+    <h3>Public</h3>
     <ul>
 <?php
-    for ($i = 0; $i < count($data->properties); $i++)
+    foreach ($data->properties['public'] as $propertyName => $property)
     {
-        $property = $data->properties[$i];
-        echo "<li>{$property->name}</li>";
+        echo "<li><a href=\"view.php?src=$src&amp;property={$property->name}\">{$property->name}</a></li>";
     }
 ?>
     </ul>
+
+    <h3>Protected</h3>
+    <ul>
+<?php
+    foreach ($data->properties['protected'] as $propertyName => $property)
+    {
+        echo "<li><a href=\"view.php?src=$src&amp;property={$property->name}\">{$property->name}</a></li>";
+    }
+?>
+    </ul>
+
+    <h3>Private</h3>
+    <ul>
+<?php
+    foreach ($data->properties['private'] as $propertyName => $property)
+    {
+        echo "<li><a href=\"view.php?src=$src&amp;property={$property->name}\">{$property->name}</a></li>";
+    }
+?>
+    </ul>
+
 
 </body>
 </html>

@@ -98,6 +98,12 @@ Phaser.Text = function (game, x, y, text, style) {
     this._lineSpacing = 0;
 
     /**
+    * @property {number} _charCount - Internal character counter used by the text coloring.
+    * @private
+    */
+    this._charCount = 0;
+
+    /**
     * @property {Phaser.Events} events - The Events you can subscribe to that are dispatched when certain things happen on this Sprite or its components.
     */
     this.events = new Phaser.Events(this);
@@ -111,6 +117,11 @@ Phaser.Text = function (game, x, y, text, style) {
     * @property {Phaser.Point} cameraOffset - If this object is fixedToCamera then this stores the x/y offset that its drawn at, from the top-left of the camera view.
     */
     this.cameraOffset = new Phaser.Point();
+
+    /**
+    * @property {array} colors - An array of the color values as specified by `Text.addColor`.
+    */
+    this.colors = [];
 
     this.setStyle(style);
 
@@ -303,14 +314,14 @@ Phaser.Text.prototype.setShadow = function (x, y, color, blur) {
 * Set the style of the text by passing a single style object to it.
 *
 * @method Phaser.Text.prototype.setStyle
-* @param [style] {Object} The style parameters
-* @param [style.font='bold 20pt Arial'] {String} The style and size of the font
-* @param [style.fill='black'] {Object} A canvas fillstyle that will be used on the text eg 'red', '#00FF00'
-* @param [style.align='left'] {String} Alignment for multiline text ('left', 'center' or 'right'), does not affect single line text
-* @param [style.stroke='black'] {String} A canvas fillstyle that will be used on the text stroke eg 'blue', '#FCFF00'
-* @param [style.strokeThickness=0] {Number} A number that represents the thickness of the stroke. Default is 0 (no stroke)
-* @param [style.wordWrap=false] {Boolean} Indicates if word wrap should be used
-* @param [style.wordWrapWidth=100] {Number} The width at which text will wrap
+* @param {Object} [style] - The style properties to be set on the Text.
+* @param {string} [style.font='bold 20pt Arial'] - The style and size of the font.
+* @param {string} [style.fill='black'] - A canvas fillstyle that will be used on the text eg 'red', '#00FF00'.
+* @param {string} [style.align='left'] - Alignment for multiline text ('left', 'center' or 'right'), does not affect single line text.
+* @param {string} [style.stroke='black'] - A canvas stroke style that will be used on the text stroke eg 'blue', '#FCFF00'.
+* @param {number} [style.strokeThickness=0] - A number that represents the thickness of the stroke. Default is 0 (no stroke).
+* @param {boolean} [style.wordWrap=false] - Indicates if word wrap should be used.
+* @param {number} [style.wordWrapWidth=100] - The width in pixels at which text will wrap.
 */
 Phaser.Text.prototype.setStyle = function (style) {
 
@@ -393,6 +404,8 @@ Phaser.Text.prototype.updateText = function () {
     this.context.lineCap = 'round';
     this.context.lineJoin = 'round';
 
+    this._charCount = 0;
+
     //draw lines line by line
     for (i = 0; i < lines.length; i++)
     {
@@ -409,24 +422,91 @@ Phaser.Text.prototype.updateText = function () {
 
         linePosition.y += this._lineSpacing;
 
-        if (this.style.stroke && this.style.strokeThickness)
+        if (this.colors.length > 0)
         {
-            this.context.strokeText(lines[i], linePosition.x, linePosition.y);
+            this.updateLine(lines[i], linePosition.x, linePosition.y);
         }
-
-        if (this.style.fill)
+        else
         {
-            this.context.fillText(lines[i], linePosition.x, linePosition.y);
+            if (this.style.stroke && this.style.strokeThickness)
+            {
+                this.context.strokeText(lines[i], linePosition.x, linePosition.y);
+            }
+
+            if (this.style.fill)
+            {
+                this.context.fillText(lines[i], linePosition.x, linePosition.y);
+            }
         }
     }
 
     this.updateTexture();
 };
 
+Phaser.Text.prototype.updateLine = function (line, x, y) {
+
+    for (var i = 0; i < line.length; i++)
+    {
+        var letter = line[i];
+
+        if (this.colors[this._charCount])
+        {
+            this.context.fillStyle = this.colors[this._charCount];
+            this.context.strokeStyle = this.colors[this._charCount];
+        }
+
+        if (this.style.stroke && this.style.strokeThickness)
+        {
+            this.context.strokeText(letter, x, y);
+        }
+
+        if (this.style.fill)
+        {
+            this.context.fillText(letter, x, y);
+        }
+
+        x += this.context.measureText(letter).width;
+
+        this._charCount++;
+    }
+
+};
+
+/**
+* Clears any previously set color stops.
+*
+* @method Phaser.Text.prototype.clearColors
+*/
+Phaser.Text.prototype.clearColors = function () {
+
+    this.colors = [];
+    this.dirty = true;
+
+};
+
+/**
+* This method allows you to set specific colors within the Text.
+* It works by taking a color value, which is a typical HTML string such as `#ff0000` or `rgb(255,0,0)` and a position.
+* The position value is the index of the character in the Text string to start applying this color to.
+* Once set the color remains in use until either another color or the end of the string is encountered.
+* For example if the Text was `Photon Storm` and you did `Text.addColor('#ffff00', 6)` it would color in the word `Storm` in yellow.
+*
+* @method Phaser.Text.prototype.addColor
+* @param {string} color - A canvas fillstyle that will be used on the text eg `red`, `#00FF00`, `rgba()`.
+* @param {number} position - The index of the character in the string to start applying this color value from.
+*/
+Phaser.Text.prototype.addColor = function (color, position) {
+
+    this.colors[position] = color;
+    this.dirty = true;
+
+};
+
 /**
 * Greedy wrapping algorithm that will wrap words as the line grows longer than its horizontal bounds.
 *
 * @method Phaser.Text.prototype.runWordWrap
+* @param {string} text - The text to perform word wrap detection against.
 * @private
 */
 Phaser.Text.prototype.runWordWrap = function (text) {
@@ -507,7 +587,11 @@ Object.defineProperty(Phaser.Text.prototype, 'text', {
         {
             this._text = value.toString() || ' ';
             this.dirty = true;
-            this.updateTransform();
+
+            if (this.parent)
+            {
+                this.updateTransform();
+            }
         }
 
     }
@@ -531,7 +615,11 @@ Object.defineProperty(Phaser.Text.prototype, 'font', {
             this._font = value.trim();
             this.style.font = this._fontWeight + ' ' + this._fontSize + "px '" + this._font + "'";
             this.dirty = true;
-            this.updateTransform();
+
+            if (this.parent)
+            {
+                this.updateTransform();
+            }
         }
 
     }
@@ -557,7 +645,11 @@ Object.defineProperty(Phaser.Text.prototype, 'fontSize', {
             this._fontSize = value;
             this.style.font = this._fontWeight + ' ' + this._fontSize + "px '" + this._font + "'";
             this.dirty = true;
-            this.updateTransform();
+
+            if (this.parent)
+            {
+                this.updateTransform();
+            }
         }
 
     }
@@ -581,7 +673,11 @@ Object.defineProperty(Phaser.Text.prototype, 'fontWeight', {
             this._fontWeight = value;
             this.style.font = this._fontWeight + ' ' + this._fontSize + "px '" + this._font + "'";
             this.dirty = true;
-            this.updateTransform();
+
+            if (this.parent)
+            {
+                this.updateTransform();
+            }
         }
 
     }
@@ -736,7 +832,11 @@ Object.defineProperty(Phaser.Text.prototype, 'lineSpacing', {
         {
             this._lineSpacing = parseFloat(value);
             this.dirty = true;
-            this.updateTransform();
+
+            if (this.parent)
+            {
+                this.updateTransform();
+            }
         }
 
     }

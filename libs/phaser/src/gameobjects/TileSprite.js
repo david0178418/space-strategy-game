@@ -10,6 +10,7 @@
 *
 * @class Phaser.TileSprite
 * @constructor
+* @extends Pixi.TilingSprite
 * @param {Phaser.Game} game - A reference to the currently running game.
 * @param {number} x - The x coordinate (in world space) to position the TileSprite at.
 * @param {number} y - The y coordinate (in world space) to position the TileSprite at.
@@ -417,6 +418,10 @@ Phaser.TileSprite.prototype.setFrame = function(frame) {
         this.texture.height = frame.sourceSizeH;
         this.texture.frame.width = frame.sourceSizeW;
         this.texture.frame.height = frame.sourceSizeH;
+    }
+    else if (!frame.trimmed && this.texture.trim)
+    {
+        this.texture.trim = null;
     }
 
     if (this.game.renderType === Phaser.WEBGL)
