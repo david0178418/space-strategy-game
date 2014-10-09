@@ -1,4 +1,9 @@
 <?php
+    if (isset($_GET['src']))
+    {
+        $src = $_GET['src'];
+    }
+
     require 'src/Block.php';
     require 'src/ClassDesc.php';
     require 'src/Constant.php';
@@ -7,19 +12,17 @@
     require 'src/Property.php';
     require 'src/ReturnType.php';
     require 'src/Processor.php';
+    require 'src/PhaserDocGen.php';
 
-    // $data = new Processor("../src/gameobjects/Sprite.js");
-    $data = new Processor("../src/loader/Cache.js");
-    
     header('Content-Type: application/json');
 
-    $raw = [];
-    
-    $raw['consts'] = $data->getConstsArray();
+    $gen = new PhaserDocGen();
+    $gen->start();
 
-    echo json_encode($raw);
-    
-//    echo $data->consts[0]->getJSON();
-    
+    $sprite = $gen->get('Phaser.Sprite');
+
+    $gen->extend('Phaser.Sprite');
+
+    echo $sprite->getJSON();
 
 ?>
