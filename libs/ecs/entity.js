@@ -51,6 +51,9 @@ _.extend(Entity.prototype, {
 		components = _.isArray(components) ? components: [components];
 		return _.all(components, this.hasComponent, this);
 	},
+	containsPoint: function(x, y) {
+		return this.getBounds().contains(x, y);
+	},
 	removeComponent: function(component) {
 		delete this.components[component];
 	},

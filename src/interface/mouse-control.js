@@ -19,12 +19,13 @@ module.exports = {
 		this.controls = instanceManager.get('controls');
 		this.mousePointer = game.input.mousePointer;
 		this.worldEntities = instanceManager.get('worldEntities');
+		this.uiViewModel = instanceManager.get('uiViewModel');
 
 		this.graphic = this.game.add.graphics(-500, -500);
 		this.graphic.alpha = 0.25;
 		this.graphic.visible = false;
 
-		this.game.input.onUp.add(this.markRightClick.bind(this));
+		this.game.input.onUp.add(this.markClick.bind(this));
 		this.game.input.onTap.add(this.differentiateClick.bind(this));
 		this.game.input.onUp.add(this.dragEnd.bind(this));
 		this.game.input.mouse.mouseMoveCallback = this.drag.bind(this);
@@ -37,19 +38,26 @@ module.exports = {
 
 		if(this.mousePointer.msSinceLastClick > game.input.doubleTapRate) {
 			this.checkForDoubleClick = false;
-			this.leftSingleClick(this.mousePointer.positionUp.x, this.mousePointer.positionUp.y);
+			this.leftSingleClick(this.mousePointer.positionUp);
 		}
 	},
 
 	differentiateClick: function(pointer, isDoubleClick) {
 		if(pointer.button === Phaser.Mouse.RIGHT_BUTTON) {
-			this.rightClick(pointer.x, pointer.y);
+			this.rightClick(game.input.getLocalPosition(this.worldEntities, pointer));
 			return;
 		}
 
-		if(isDoubleClick) {
+		if(this.uiViewModel.awaitTarget()) {
+			this.uiViewModel.awaitTarget(false);
+			this.uiViewModel.targetHandler(pointer);
+
+			//HACK to mark click for general actions
+			this.markClick({button: Phaser.Mouse.RIGHT_BUTTON});
+			this.uiViewModel.targetHandler = null;
+		} else if(isDoubleClick) {
 			this.checkForDoubleClick = false;
-			this.leftDoubleClick(pointer.x, pointer.y);
+			this.leftDoubleClick(this.mousePointer.positionUp);
 		} else {
 			this.checkForDoubleClick = true;
 		}
@@ -122,9 +130,9 @@ module.exports = {
 		graphic.endFill();
 	},
 
-	leftDoubleClick: function(x, y) {
+	leftDoubleClick: function(position) {
 		var entities = this.ecs.getEntities('selectable');
-		var selectedEntity = this.getTopEntityAt(entities, x, y);
+		var selectedEntity = this.getTopEntityAt(entities, position);
 		var selectedEntityTeam;
 		var selectedEntityTeamComponent;
 
@@ -151,16 +159,16 @@ module.exports = {
 		});
 	},
 
-	leftSingleClick: function(x, y) {
+	leftSingleClick: function(position) {
 		var entities = this.ecs.getEntities('selectable');
-		var selectedEntity = this.getTopEntityAt(entities, x, y);
+		var selectedEntity = this.getTopEntityAt(entities, position);
 
 		_.each(entities, function(entity) {
 			entity.toggleComponent('selected', entity === selectedEntity);
 		});
 	},
 
-	markRightClick: function(ev) {
+	markClick: function(ev) {
 		if(ev.button !== Phaser.Mouse.RIGHT_BUTTON) {
 			return;
 		}
@@ -186,27 +194,30 @@ module.exports = {
 		markerTween.start();
 	},
 
-	rightClick: function(x, y) {
-		var entities = this.ecs.getEntities('selectable');
-		
-		_.each(entities, function(entity) {
-			if(entity.is('selected')) {
-				entity.addComponent('issue-order', {
-					x: x,
-					y: y,
-				});
-			}
-		});
+	rightClick: function(position) {
+		var entities = this.ecs.getEntities('selected');
+
+		if(this.uiViewModel.awaitTarget()) {
+			this.uiViewModel.awaitTarget(false);
+
+			_.each(entities, function(entity) {
+				entity.removeComponent('selected');
+			});
+		} else {
+			_.each(entities, function(entity) {
+				entity.addComponent('issue-order', position);
+			});
+		}
 	},
 
-	getTopEntityAt: function(entities, x, y) {
+	getTopEntityAt: function(entities, position) {
 		var topEntity;
 
 		_.each(entities, function(entity) {
 			if(
 				entity.components.team.name === 'player' &&
 				(!topEntity || topEntity.z < entity.z) &&
-				entity.getBounds().contains(x, y)
+				entity.containsPoint(position.x, position.y)
 			) {
 				topEntity = entity;
 			}

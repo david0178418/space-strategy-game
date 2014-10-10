@@ -70,10 +70,6 @@ require('ecs/ecs').registerSystem('formation', {
 					y: formationPositionY,
 				});
 			} else {
-				if(waypointsComponent && waypointsComponent.inProgress) {
-					this.stopMovement(waypointsComponent.inProgress);
-				}
-
 				entity.components.waypoints = {
 					queued: [
 						{
@@ -91,8 +87,4 @@ require('ecs/ecs').registerSystem('formation', {
 			this.moveOrderSound.play();
 		}
 	},
-	stopMovement: function(waypoint) {
-		waypoint.moveTween.stop();
-		waypoint.rotationTween.stop();
-	}
 });

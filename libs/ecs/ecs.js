@@ -35,6 +35,12 @@ var ECS_DEBUG = {
 	},
 
 	getEntities: function(components) {
+		if(!components) {
+			return this._entities.slice(0);
+		} else if(!_.isArray(components)) {
+			components = [components];
+		}
+
 		return _.select(this._entities, function(entity) {
 			return entity.hasComponents(components);
 		});
