@@ -14,22 +14,42 @@ require('ecs/ecs').registerSystem('movement', {
 	},
 
 	runOne: function(entity) {
+		var waypoints = entity.components.waypoints;
+		var speed = entity.components.movable.speed;
+
+		if(!entity.body) {
+			this.game.physics.enable(entity, Phaser.Physics.ARCADE);
+			entity.body.allowRotation = false;
+			entity.body.maxVelocity.setTo(entity.components.movable.speed);
+		}
+
+		if(!waypoints.inProgress) {
+			waypoints.inProgress = waypoints.queued.shift();
+			this.game.physics.arcade.moveToXY(entity, waypoints.inProgress.x, waypoints.inProgress.y, speed);
+			this.game.add.tween(entity).to({
+				rotation: Phaser.Point.angle(waypoints.inProgress, entity.position),
+			}, 500, undefined, true);
+		} else if(game.physics.arcade.distanceToXY(entity, waypoints.inProgress.x, waypoints.inProgress.y) < entity.width) {
+			waypoints.inProgress.onComplete && waypoints.inProgress.onComplete();
+			waypoints.inProgress = null;
+
+			if(!waypoints.queued.length) {
+				entity.removeComponent("waypoints");
+				entity.body.velocity.setTo(0);
+			}
+		}
+	},
+
+	runOneOLD: function(entity) {
 		//TODO figure out better/more efficient waypoint structure
 		var inProgressWaypoint = entity.components.waypoints.inProgress;
 		var queuedWaypoints = entity.components.waypoints.queued;
-		var waypoint;
 		var time;
 
 		if(inProgressWaypoint && inProgressWaypoint.complete) {
 			entity.components.waypoints.inProgress = null;
 			inProgressWaypoint = null;
 		}
-
-		for(var i = 0; i < queuedWaypoints.length; i++) {
-			waypoint = queuedWaypoints[i];
-		}
-
-		//waypoint = _.last(queuedWaypoints);
 
 		if(!inProgressWaypoint && !queuedWaypoints.length) {
 			// TODO Ensure new structure makes this block dead code.

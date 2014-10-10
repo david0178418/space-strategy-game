@@ -27,8 +27,8 @@ game.state.add(States.Play, {
 	create: function(game) {
 		game.scale.setShowAll();
 
-		window.addEventListener('click', function(e) {
-			game.scale.startFullScreen(false);
+		window.addEventListener('resize', function(e) {
+		game.scale.setShowAll();
 			game.scale.refresh();
 		});
 		game.world.setBounds(0, 0, CONFIG.stage.width, CONFIG.stage.height);

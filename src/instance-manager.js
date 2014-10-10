@@ -20,7 +20,7 @@ var instanceManager = {
 	},
 	reset: function(dependency) {
 		instances[dependency] = resources[dependency]();
-	}
+	},
 };
 	
 var resources = {
@@ -44,7 +44,7 @@ var resources = {
 				panLeft: keyboard.addKey(KeyCodes.A),
 				shiftModifier: keyboard.addKey(KeyCodes.SHIFT),
 			};
-		}
+		},
 	},
 	
 	game: {
@@ -62,7 +62,7 @@ var resources = {
 		cache: false,
 		init: function() {
 			return instanceManager.get('game').add.group();
-		}
+		},
 	},
 	
 	hud: {
@@ -87,7 +87,7 @@ var resources = {
 			//TODO: Remove global debug;
 			window.viewModel = viewModel;
 			return viewModel;
-		}
+		},
 	},
 	
 	worldEntities: {
@@ -96,7 +96,7 @@ var resources = {
 			var worldEntities = window.worldEntities = instanceManager.get('group');
 			
 			return worldEntities;
-		}	
+		},
 	},
 };
 

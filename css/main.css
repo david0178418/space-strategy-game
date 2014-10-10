@@ -4,6 +4,10 @@ body {
 	-webkit-user-select: none;
 }
 
+body.awaiting-target {
+	cursor: crosshair;
+}
+
 canvas {
 	margin: auto;
 	position: absolute;
