@@ -19,6 +19,15 @@ require('ecs/ecs').registerSystem('movement', {
 
 		if(!waypoints.inProgress) {
 			waypoints.inProgress = waypoints.queued.shift();
+
+			if(waypoints.inProgress.hyperspace) {
+				entity.rotation = Phaser.Point.angle(waypoints.inProgress, entity.position);
+				entity.position.setTo(waypoints.inProgress.x, waypoints.inProgress.y);
+				entity.removeComponent('hyperdrive-ready');
+				entity.components.hyperdrive.timeCharged = 0;
+				return;
+			}
+
 			this.game.physics.arcade.moveToXY(entity, waypoints.inProgress.x, waypoints.inProgress.y, speed);
 			this.game.add.tween(entity).to({
 				rotation: Phaser.Point.angle(waypoints.inProgress, entity.position),

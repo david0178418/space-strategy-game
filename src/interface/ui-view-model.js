@@ -75,7 +75,7 @@ var componentButtons = {
 		},
 	}],
 	'colonizer': [{
-		label: "Colonize",
+		label: 'Colonize',
 		handler: function() {
 			interface.awaitTarget(true);
 			//TODO Figure better solution for this temporary hack
@@ -103,8 +103,46 @@ var componentButtons = {
 			}
 		},
 	}],
+	'hyperdrive': [{
+		label: 'Charge Hyperdrive',
+		handler: function() {
+			_.each(ecs.getEntities('selected'), function(entity) {
+				var chargeTween = game.add.tween(entity.components.hyperdrive).to({
+					timeCharged: entity.components.hyperdrive.chargeTime
+				}, entity.components.hyperdrive.chargeTime);
+
+				chargeTween.onComplete.add(this.charged, entity);
+				chargeTween.start();
+			}, this);
+		},
+		charged: function() {
+			this.addComponent('hyperdrive-ready');
+			interface.update();
+		},
+
+	}],
+	'hyperdrive-ready': [{
+		label: 'Hyperspace Jump',
+		handler: function() {
+			interface.awaitTarget(true);
+			//TODO Figure better solution for this temporary hack
+			interface.targetHandler = this.targetHandler;
+		},
+		targetHandler: function(pointer) {
+			var targetPosition = game.input.getLocalPosition(worldEntities, pointer);
+			var selectedEntities = ecs.getEntities('selected');
+
+			_.each(selectedEntities, function(entity) {
+			entity
+				.addComponent('group-movement', {
+					hyperspace: true,
+					centralPoint: targetPosition,
+				});
+			});
+		},
+	}],
 	'movable': [{
-		label: "Move to",
+		label: 'Move to',
 		handler: function() {
 			interface.awaitTarget(true);
 			//TODO Figure better solution for this temporary hack
@@ -122,7 +160,7 @@ var componentButtons = {
 		},
 	}],
 	'ship-generator': [{
-		label: "Set Rally Point",
+		label: 'Set Rally Point',
 		handler: function() {
 			interface.awaitTarget(true);
 			//TODO Figure better solution for this temporary hack

@@ -75,6 +75,7 @@ require('ecs/ecs').registerSystem('formation', {
 						{
 							x: formationPositionX,
 							y: formationPositionY,
+							hyperspace: groupMovementComponent.hyperspace,
 						}
 					]
 				};
