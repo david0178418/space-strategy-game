@@ -16,6 +16,10 @@ function Entity(x, y, graphic) {
 	var game = instanceManager.get('game');
 
 	Phaser.Sprite.call(this, game, x, y, graphic);
+
+	this.game.physics.enable(this, Phaser.Physics.ARCADE);
+	this.body.allowRotation = false;
+	
 	this.anchor.setTo(0.5, 0.5);
 	this.autoCull = true;
 }

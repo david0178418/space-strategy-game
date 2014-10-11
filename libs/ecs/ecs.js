@@ -28,8 +28,7 @@ var ECS_DEBUG = {
 	},
 
 	destroyEntity: function(entity) {
-		var entityId = _.isObject(entity) ? entity.get('id') : entityId;
-		delete this._entities[entityId];
+		this._entities.splice(this._entities.indexOf(entity), 1);
 		entity.destroy();
 		return this;
 	},

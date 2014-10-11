@@ -93,7 +93,9 @@ var componentButtons = {
 							x: targetEntity.x,
 							y: targetEntity.y,
 							onComplete: function() {
-								entity.addComponent('colonize');
+								entity.addComponent('colonize', {
+									targetEntity: targetEntity,
+								});
 								console.log('colonize!!!');
 							},
 						}]

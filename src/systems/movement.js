@@ -17,12 +17,6 @@ require('ecs/ecs').registerSystem('movement', {
 		var waypoints = entity.components.waypoints;
 		var speed = entity.components.movable.speed;
 
-		if(!entity.body) {
-			this.game.physics.enable(entity, Phaser.Physics.ARCADE);
-			entity.body.allowRotation = false;
-			entity.body.maxVelocity.setTo(entity.components.movable.speed);
-		}
-
 		if(!waypoints.inProgress) {
 			waypoints.inProgress = waypoints.queued.shift();
 			this.game.physics.arcade.moveToXY(entity, waypoints.inProgress.x, waypoints.inProgress.y, speed);

@@ -41,6 +41,9 @@ require('ecs/ecs').registerSystem('selection', {
 				this.worldEntities.addChild(graphic);
 				selectableComponent.graphic = graphic;
 				this.selectionChanged = true;
+
+				entity.events.onDestroy.addOnce(graphic.kill, graphic);
+				entity.events.onDestroy.addOnce(this.uiViewModel.update, this.uiViewModel);
 			} else if(!selectableComponent.graphic.visible) {
 				selectableComponent.graphic.visible = true;
 				this.selectionChanged = true;
