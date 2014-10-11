@@ -94,9 +94,8 @@ var componentButtons = {
 							y: targetEntity.y,
 							onComplete: function() {
 								entity.addComponent('colonize', {
-									targetEntity: targetEntity,
+									target: targetEntity,
 								});
-								console.log('colonize!!!');
 							},
 						}]
 					};
@@ -119,6 +118,22 @@ var componentButtons = {
 				entity.components['group-movement'] = {
 					centralPoint: targetPosition,
 				};
+			});
+		},
+	}],
+	'ship-generator': [{
+		label: "Set Rally Point",
+		handler: function() {
+			interface.awaitTarget(true);
+			//TODO Figure better solution for this temporary hack
+			interface.targetHandler = this.targetHandler;
+		},
+		targetHandler: function(pointer) {
+			var targetPosition = game.input.getLocalPosition(worldEntities, pointer);
+			var selectedEntities = ecs.getEntities('selected');
+
+			_.each(selectedEntities, function(entity) {
+				entity.components['ship-generator'].rallyPoint = targetPosition;
 			});
 		},
 	}],
