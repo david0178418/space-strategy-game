@@ -5,6 +5,9 @@ module.exports = function(x, y) {
 
 		.addComponent('team')
 		.addComponent('selectable')
+		.addComponent('ship-bay', {
+			space: 100,
+		})
 		.addComponent('hyperdrive', {
 			chargeTime: 5000,
 			timeCharged: 0,

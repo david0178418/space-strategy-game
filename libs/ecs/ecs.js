@@ -19,6 +19,7 @@ var ECS_DEBUG = {
 	createComponent: function(name, props) {
 		var component = this._components[name];
 		props = props || {};
+		
 		if(!component) {
 			this.registerComponent(name, props);
 			return props;
@@ -35,13 +36,15 @@ var ECS_DEBUG = {
 
 	getEntities: function(components) {
 		if(!components) {
-			return this._entities.slice(0);
+			return _.select(this._entities.slice(0), function(entity) {
+				return entity.alive;
+			});
 		} else if(!_.isArray(components)) {
 			components = [components];
 		}
 
 		return _.select(this._entities, function(entity) {
-			return entity.hasComponents(components);
+			return entity.alive && entity.hasComponents(components);
 		});
 	},
 

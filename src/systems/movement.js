@@ -20,7 +20,7 @@ require('ecs/ecs').registerSystem('movement', {
 		if(!waypoints.inProgress) {
 			waypoints.inProgress = waypoints.queued.shift();
 
-			if(waypoints.inProgress.hyperspace) {
+			if(waypoints.inProgress.hyperspace && entity.components.hyperdrive) {
 				entity.rotation = Phaser.Point.angle(waypoints.inProgress, entity.position);
 				entity.position.setTo(waypoints.inProgress.x, waypoints.inProgress.y);
 				entity.removeComponent('hyperdrive-ready');

@@ -103,6 +103,35 @@ var componentButtons = {
 			}
 		},
 	}],
+	'dockable': [{
+		label: 'Dock',
+		handler: function() {
+			interface.awaitTarget(true);
+			//TODO Figure better solution for this temporary hack
+			interface.targetHandler = this.targetHandler;
+		},
+		targetHandler: function(pointer) {
+			var targetPosition = pointer.position;
+			var selectedEntities = ecs.getEntities('selected');
+			var targetEntity = getTopEntityAt(targetPosition);
+
+			if(targetEntity && targetEntity.hasComponent('ship-bay')) {
+				_.each(selectedEntities, function(entity) {
+					entity.components.waypoints = {
+						queued: [{
+							x: targetEntity.x,
+							y: targetEntity.y,
+							onComplete: function() {
+								entity.addComponent('dock', {
+									target: targetEntity,
+								});
+							},
+						}]
+					};
+				});
+			}
+		},
+	}],
 	'hyperdrive': [{
 		label: 'Charge Hyperdrive',
 		handler: function() {
@@ -159,6 +188,34 @@ var componentButtons = {
 			});
 		},
 	}],
+	'ship-bay': [
+		{
+			label: 'Recall',
+			handler: function() {
+				console.log('dock nearest docable ships within certain range.');
+			},
+		}, {
+			label: 'Scramble',
+			handler: function() {
+				interface.awaitTarget(true);
+				//TODO Figure better solution for this temporary hack
+				interface.targetHandler = this.targetHandler;
+			},
+			targetHandler: function(pointer) {
+				var targetPosition = game.input.getLocalPosition(worldEntities, pointer);
+				
+				_.each(ecs.getEntities('selected'), function(entity) {
+					entity.addComponent('scramble', {
+						target: {
+							x: targetPosition.x,
+							y: targetPosition.y,
+						}
+					});
+				});
+
+			},
+		},
+	],
 	'ship-generator': [{
 		label: 'Set Rally Point',
 		handler: function() {
