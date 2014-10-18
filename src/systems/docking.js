@@ -6,7 +6,7 @@ require('ecs/ecs').registerSystem('docking', {
 	],
 
 	runOne: function(entity) {
-		var dockTarget = entity.components.dock.target;
+		var dockTarget = ecs.getEntityById(entity.components.dock.targetId);
 		var cargoSpace = dockTarget.components['ship-bay'].space;
 		var dockedShips;
 

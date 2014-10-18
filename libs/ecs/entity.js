@@ -10,8 +10,9 @@ function Entity(x, y, graphic) {
 
 	this._ecs = require('ecs/ecs');
 	this.components = {};
-	this.id = _.uniqueId('entity-');
 	this.entityType = graphic;
+	this.id = 'entity-'+Entity.nextId;
+	Entity.nextId++;
 
 	var game = instanceManager.get('game');
 
@@ -23,6 +24,8 @@ function Entity(x, y, graphic) {
 	this.anchor.setTo(0.5, 0.5);
 	this.autoCull = true;
 }
+
+Entity.nextId = 1;
 
 Entity.prototype = Object.create(Phaser.Sprite.prototype);
 _.extend(Entity.prototype, {

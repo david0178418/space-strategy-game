@@ -123,7 +123,7 @@ var componentButtons = {
 							y: targetEntity.y,
 							onComplete: function() {
 								entity.addComponent('dock', {
-									target: targetEntity,
+									targetId: targetEntity.id,
 								});
 							},
 						}]

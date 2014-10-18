@@ -2,10 +2,10 @@ var _ = require('lodash');
 var EntityBase = require('./entity');
 
 var ECS_DEBUG = {
+	_components: {},
 	_entities: [],
 	_initSystems: {},
 	_runSystems: {},
-	_components: {},
 	createEntity: function(x, y, graphic) {
 		var entity = new EntityBase(x, y, graphic);
 		this._entities.push(entity);
@@ -32,6 +32,12 @@ var ECS_DEBUG = {
 		this._entities.splice(this._entities.indexOf(entity), 1);
 		entity.destroy();
 		return this;
+	},
+
+	getEntityById: function(id) {
+		return _.find(this._entities, function(entity) {
+			return entity.id === id;
+		});
 	},
 
 	getEntities: function(components) {
