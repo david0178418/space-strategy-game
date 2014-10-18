@@ -19,6 +19,8 @@ require('ecs/ecs').registerSystem('scramble', {
 			ship.revive();
 		});
 
+		entity.components['ship-bay'].dockedShips = [];
+
 		entity.removeComponent('scramble');
 	},
 });
