@@ -1,6 +1,6 @@
 //Really, "Service Locator"...but whatever...  Using the
 //anti-pattern just to get this thing up.
-//TODO Organize more neatly so dependecies are known by the interface
+
 //TODO remove debug global
 var instances = {};
 
@@ -24,12 +24,6 @@ var instanceManager = {
 };
 	
 var resources = {
-		
-	beams: {
-		init: function() {
-			return instanceManager.get('group');
-		},
-	},
 
 	controls: {
 		init: function() {
@@ -62,19 +56,6 @@ var resources = {
 		cache: false,
 		init: function() {
 			return instanceManager.get('game').add.group();
-		},
-	},
-	
-	hud: {
-		init: function() {
-			var Hud = require('interface/hud');
-			return new Hud();
-		},
-	},
-	
-	ships: {
-		init: function() {
-			return instanceManager.get('group');
 		},
 	},
 
