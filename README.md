@@ -1,1 +1,4 @@
-Requires bower to install third party libraries.
+To Install:
+	npm install
+To run:
+	gulp
